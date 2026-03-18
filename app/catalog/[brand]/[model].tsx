@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { trpc } from '@/constants/trpc'
 
 type Car = { id: string; make: string; model: string; year_from: number;
-             year_to: number | null; generation_name: string | null }
+             year_to: number | null; generation_name: string | null; glb_url?: string | null }
 
 export default function GenerationsScreen() {
   const { brand, model } = useLocalSearchParams<{ brand: string; model: string }>()
+  const router = useRouter()
   const [cars, setCars] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -28,7 +29,10 @@ export default function GenerationsScreen() {
         keyExtractor={c => c.id}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card}
-            onPress={() => Alert.alert('Готово!', `Выбрано: ${item.generation_name ?? item.year_from}\n\n3D-редактор будет в Плане 2`)}>
+            onPress={() => {
+              const params = new URLSearchParams({ glbUrl: item.glb_url ?? '' })
+              router.push(`/editor/${item.id}?${params.toString()}`)
+            }}>
             <Text style={styles.gen}>{item.generation_name ?? 'Базовая'}</Text>
             <Text style={styles.years}>
               {item.year_from}–{item.year_to ?? 'н.в.'}
