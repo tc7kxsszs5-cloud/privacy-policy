@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "CarWrap",
+    "slug": "carwrap",
+    "version": "1.0.0",
+    "scheme": "carwrap",
+    "web": { "bundler": "metro" },
+    "plugins": ["expo-router"]
+  }
+}
