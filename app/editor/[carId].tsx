@@ -8,7 +8,7 @@ import { MaterialSheet } from '@/components/editor/MaterialSheet'
 import { TintSheet } from '@/components/editor/TintSheet'
 import { useEditorStore } from '@/constants/editor-store'
 import { WebViewToRN } from '@/components/CarViewer/bridge'
-import { supabase } from '@/constants/supabase'
+import { createOrder } from '@/constants/orders-service'
 import { useAuth } from '@/constants/AuthContext'
 
 const DEMO_GLB = 'https://threejs.org/examples/models/gltf/ferrari.glb'
@@ -76,18 +76,33 @@ export default function EditorScreen() {
     viewerRef.current?.send({ type: 'reset_all' })
   }, [resetAll])
 
-  const handleSave = useCallback(async () => {
-    if (!user) return Alert.alert('Войдите чтобы сохранить')
-    const { data, error } = await supabase.from('configs').insert({
-      user_id: user.id,
-      car_id: carId,
-      parts_config: Object.entries(partsConfig).map(([part_id, v]) => ({ part_id, ...v })),
-      windows_config: Object.entries(windowsConfig).map(([window_id, v]) => ({ window_id, ...v })),
-    }).select().single()
+  const handleSendOrder = useCallback(async () => {
+    if (!user) return Alert.alert('Войдите чтобы отправить заявку')
 
-    if (error) return Alert.alert('Ошибка', error.message)
-    Alert.alert('Сохранено!', `ID: ${data.id}`)
-  }, [user, carId, partsConfig, windowsConfig])
+    const partsArray = Object.entries(partsConfig).map(([part_id, v]) => ({ part_id, ...v }))
+    const windowsArray = Object.entries(windowsConfig).map(([window_id, v]) => ({ window_id, ...v }))
+
+    if (partsArray.length === 0 && windowsArray.length === 0) {
+      return Alert.alert('Выберите хотя бы один элемент', 'Нажмите на деталь машины чтобы изменить цвет')
+    }
+
+    try {
+      await createOrder({
+        client_id: user.id,
+        car_id: carId,
+        car_name: '',
+        parts_config: partsArray as any,
+        windows_config: windowsArray as any,
+      })
+      Alert.alert(
+        'Заявка отправлена!',
+        'Мы получили вашу конфигурацию. Приезжайте в студию Флор для согласования и оплаты.',
+        [{ text: 'Мои заявки', onPress: () => router.push('/orders') }, { text: 'OK' }]
+      )
+    } catch (e: any) {
+      Alert.alert('Ошибка', e.message)
+    }
+  }, [user, carId, partsConfig, windowsConfig, router])
 
   const handleShare = useCallback(async () => {
     await Share.share({ message: `CarWrap конфигурация машины — carwrap://editor/${carId}` })
@@ -118,8 +133,8 @@ export default function EditorScreen() {
           <TouchableOpacity style={styles.btnSecondary} onPress={handleShare}>
             <Text style={styles.btnSecondaryText}>Поделиться</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btnPrimary} onPress={handleSave}>
-            <Text style={styles.btnPrimaryText}>Сохранить</Text>
+          <TouchableOpacity style={styles.btnPrimary} onPress={handleSendOrder}>
+            <Text style={styles.btnPrimaryText}>Отправить заявку</Text>
           </TouchableOpacity>
         </View>
       </View>
