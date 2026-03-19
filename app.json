@@ -4,7 +4,14 @@
     "slug": "carwrap",
     "version": "1.0.0",
     "scheme": "carwrap",
-    "web": { "bundler": "metro" },
-    "plugins": ["expo-router", "react-native-reanimated"]
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.kiku79.carwrap"
+    }
   }
 }
