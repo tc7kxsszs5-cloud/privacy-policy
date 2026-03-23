@@ -25,27 +25,24 @@ export default function PricesScreen() {
           return (
             <View key={category} style={styles.categoryBlock}>
               <Text style={styles.catTitle}>{category}</Text>
-              {services.map((service, si) =>
-                service.items.map((item, ii) => {
-                  const isFirst = si === 0 && ii === 0
-                  return (
-                    <TouchableOpacity
-                      key={`${service.id}-${ii}`}
-                      style={[styles.row, !isFirst && styles.rowBorder]}
-                      onPress={() => router.push(`/prices/${service.id}`)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.itemName}>{item.name}</Text>
-                      <View style={styles.rowRight}>
-                        <Text style={styles.price}>
-                          от {item.price_from.toLocaleString('ru-RU')} {item.unit}
-                        </Text>
-                        <Text style={styles.chevron}>›</Text>
-                      </View>
-                    </TouchableOpacity>
-                  )
-                })
-              )}
+              {services.flatMap(service =>
+                service.items.map(item => ({ ...item, serviceId: service.id }))
+              ).map((item, index) => (
+                <TouchableOpacity
+                  key={`${item.serviceId}-${item.name}`}
+                  style={[styles.row, index > 0 && styles.rowBorder]}
+                  onPress={() => router.push(`/prices/${item.serviceId}`)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <View style={styles.rowRight}>
+                    <Text style={styles.price}>
+                      от {item.price_from.toLocaleString('ru-RU')} {item.unit}
+                    </Text>
+                    <Text style={styles.chevron}>›</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
           )
         })}
