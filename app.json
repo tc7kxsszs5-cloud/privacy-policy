@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "CarWrap",
-    "slug": "carwrap",
+    "name": "Detailing Time",
+    "slug": "detailing-time",
     "version": "1.0.0",
-    "scheme": "carwrap",
+    "scheme": "detailingtime",
     "web": {
       "bundler": "metro"
     },
@@ -11,7 +11,17 @@
       "expo-router"
     ],
     "ios": {
-      "bundleIdentifier": "com.kiku79.carwrap"
-    }
+      "bundleIdentifier": "com.kiku79.detailingtime",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2790e3e9-a6b1-4577-8559-e1e1eff4071e"
+      }
+    },
+    "owner": "kiku79"
   }
 }
