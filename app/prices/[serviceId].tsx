@@ -48,7 +48,7 @@ export default function ServiceDetailScreen() {
         <View style={styles.priceSection}>
           <Text style={styles.priceSectionLabel}>СТОИМОСТЬ</Text>
           {service.items.map((item, i) => (
-            <View key={i} style={[styles.priceRow, i < service.items.length - 1 && styles.priceRowBorder]}>
+            <View key={item.name} style={[styles.priceRow, i < service.items.length - 1 && styles.priceRowBorder]}>
               <Text style={styles.priceName}>{item.name}</Text>
               <Text style={styles.priceValue}>
                 от {item.price_from.toLocaleString('ru-RU')} {item.unit}
