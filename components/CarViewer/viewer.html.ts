@@ -4,7 +4,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0f0f0f; overflow: hidden; width: 100vw; height: 100vh; }
+    body { background: #dce0e8; overflow: hidden; width: 100vw; height: 100vh; }
     canvas { display: block; width: 100% !important; height: 100% !important; }
     #loading {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -38,33 +38,58 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     document.body.appendChild(renderer.domElement)
 
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x0f0f0f)
+    scene.background = new THREE.Color(0xdce0e8)
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
-    camera.position.set(3, 1.5, 3)
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100)
+    camera.position.set(3.5, 1.8, 3.5)
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
     controls.dampingFactor = 0.05
-    controls.minDistance = 1.5
-    controls.maxDistance = 8
+    controls.minDistance = 0.5
+    controls.maxDistance = 10
     controls.maxPolarAngle = Math.PI / 2 + 0.2
+    controls.enablePan = false
+    controls.touches = {
+      ONE: THREE.TOUCH.ROTATE,
+      TWO: THREE.TOUCH.DOLLY_ROTATE
+    }
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
-    scene.add(ambientLight)
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2)
-    dirLight.position.set(5, 8, 5)
-    dirLight.castShadow = true
-    scene.add(dirLight)
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4)
-    fillLight.position.set(-5, 2, -5)
+    // Studio lighting — bright and even like a real detailing studio
+    // Key light: large soft box top-left
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.5)
+    keyLight.position.set(-3, 6, 3)
+    keyLight.castShadow = true
+    scene.add(keyLight)
+
+    // Fill light: right side, slightly cool
+    const fillLight = new THREE.DirectionalLight(0xeef4ff, 2.0)
+    fillLight.position.set(4, 5, 2)
     scene.add(fillLight)
 
-    // Ground plane
+    // Rim light: behind car, separates from background
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.5)
+    rimLight.position.set(0, 4, -5)
+    scene.add(rimLight)
+
+    // Top overhead: ceiling panel
+    const topLight = new THREE.DirectionalLight(0xffffff, 1.2)
+    topLight.position.set(0, 8, 0)
+    scene.add(topLight)
+
+    // Front fill: subtle from camera direction
+    const frontLight = new THREE.DirectionalLight(0xffffff, 0.8)
+    frontLight.position.set(0, 2, 8)
+    scene.add(frontLight)
+
+    // Ambient: high so shadows aren't black
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5)
+    scene.add(ambientLight)
+
+    // Ground — light studio floor
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(20, 20),
-      new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 })
+      new THREE.MeshStandardMaterial({ color: 0xc8ccd4, roughness: 0.6 })
     )
     ground.rotation.x = -Math.PI / 2
     ground.receiveShadow = true

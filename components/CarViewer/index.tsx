@@ -45,5 +45,5 @@ export const CarViewer = forwardRef<CarViewerHandle, Props>(({ onMessage }, ref)
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  webview: { flex: 1, backgroundColor: '#0f0f0f' },
+  webview: { flex: 1, backgroundColor: '#dce0e8' },
 })

@@ -11,10 +11,10 @@ import { WebViewToRN } from '@/components/CarViewer/bridge'
 import { createOrder } from '@/constants/orders-service'
 import { useAuth } from '@/constants/AuthContext'
 
-const DEMO_GLB = 'https://threejs.org/examples/models/gltf/ferrari.glb'
+const DEMO_GLB = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb'
 
 export default function EditorScreen() {
-  const { carId, glbUrl } = useLocalSearchParams<{ carId: string; glbUrl?: string }>()
+  const { carId, glbUrl, carName } = useLocalSearchParams<{ carId: string; glbUrl?: string; carName?: string }>()
   const router = useRouter()
   const { user } = useAuth()
 
@@ -33,11 +33,19 @@ export default function EditorScreen() {
     setCarId(carId, modelUrl)
   }, [carId])
 
+  const GLASS_MESH_PATTERNS = ['glass_', 'Window', 'Windshield', 'windshield', 'window', 'Glass']
+
   const handleViewerMessage = useCallback((msg: WebViewToRN) => {
     if (msg.type === 'model_loaded') {
-      // Re-apply any saved state
+      const { partsConfig, windowsConfig } = useEditorStore.getState()
+      Object.entries(partsConfig).forEach(([meshName, { colorHex, finish }]) => {
+        viewerRef.current?.send({ type: 'apply_material', meshName, colorHex, finish })
+      })
+      Object.entries(windowsConfig).forEach(([meshName, { tintPercent }]) => {
+        if (tintPercent > 0) viewerRef.current?.send({ type: 'apply_tint', meshName, tintPercent })
+      })
     } else if (msg.type === 'mesh_tapped') {
-      const isGlass = msg.meshName.startsWith('glass_')
+      const isGlass = GLASS_MESH_PATTERNS.some(p => msg.meshName.includes(p))
       selectMesh(msg.meshName)
       if (isGlass) {
         materialSheetRef.current?.close()
@@ -90,7 +98,7 @@ export default function EditorScreen() {
       await createOrder({
         client_id: user.id,
         car_id: carId,
-        car_name: '',
+        car_name: carName ?? '',
         parts_config: partsArray as any,
         windows_config: windowsArray as any,
       })
@@ -126,8 +134,13 @@ export default function EditorScreen() {
 
       <View style={styles.actionBar}>
         <View style={styles.stats}>
-          {partsCount > 0 && <Text style={styles.stat}>{partsCount} деталей</Text>}
-          {tintCount > 0 && <Text style={styles.stat}>{tintCount} стёкол</Text>}
+          {selectedMesh
+            ? <Text style={styles.selectedMesh}>✦ {selectedMesh}</Text>
+            : <>
+                {partsCount > 0 && <Text style={styles.stat}>{partsCount} деталей</Text>}
+                {tintCount > 0 && <Text style={styles.stat}>{tintCount} стёкол</Text>}
+              </>
+          }
         </View>
         <View style={styles.actions}>
           <TouchableOpacity style={styles.btnSecondary} onPress={handleShare}>
@@ -141,7 +154,7 @@ export default function EditorScreen() {
 
       {partsCount === 0 && tintCount === 0 && (
         <View style={styles.hint} pointerEvents="none">
-          <Text style={styles.hintText}>Нажми на деталь машины чтобы изменить цвет</Text>
+          <Text style={styles.hintText}>Увеличь (pinch) и нажми на деталь — бампер, зеркало, молдинг</Text>
         </View>
       )}
 
@@ -162,34 +175,35 @@ export default function EditorScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f0f' },
+  root: { flex: 1, backgroundColor: '#0a0a0a' },
   header: {
     position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingTop: 56, paddingHorizontal: 16, paddingBottom: 12,
-    backgroundColor: 'rgba(15,15,15,0.8)',
+    backgroundColor: 'rgba(10,10,10,0.9)',
   },
   backBtn: { padding: 4 },
-  backText: { color: '#fff', fontSize: 16 },
+  backText: { color: '#C9A84C', fontSize: 16 },
   resetText: { color: '#e63946', fontSize: 14 },
   actionBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: 'rgba(15,15,15,0.95)',
+    backgroundColor: 'rgba(10,10,10,0.95)',
     padding: 16, paddingBottom: 32,
   },
   stats: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  stat: { color: '#888', fontSize: 12 },
+  stat: { color: '#666', fontSize: 12 },
+  selectedMesh: { color: '#C9A84C', fontSize: 12, fontWeight: '600' },
   actions: { flexDirection: 'row', gap: 12 },
   btnSecondary: {
     flex: 1, padding: 14, borderRadius: 12, borderWidth: 1,
-    borderColor: '#333', alignItems: 'center',
+    borderColor: 'rgba(201,168,76,0.25)', alignItems: 'center',
   },
   btnSecondaryText: { color: '#fff', fontWeight: '600' },
   btnPrimary: {
     flex: 1, padding: 14, borderRadius: 12,
-    backgroundColor: '#e63946', alignItems: 'center',
+    backgroundColor: '#C9A84C', alignItems: 'center',
   },
-  btnPrimaryText: { color: '#fff', fontWeight: '700' },
+  btnPrimaryText: { color: '#000', fontWeight: '800' },
   hint: {
     position: 'absolute', top: '50%', left: 24, right: 24,
     alignItems: 'center',

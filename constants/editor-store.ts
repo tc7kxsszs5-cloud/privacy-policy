@@ -32,7 +32,10 @@ export const useEditorStore = create<EditorStore>((set) => ({
   partsConfig: {},
   windowsConfig: {},
 
-  setCarId: (id, glbUrl) => set({ carId: id, glbUrl, partsConfig: {}, windowsConfig: {}, selectedMesh: null }),
+  setCarId: (id, glbUrl) => set(s => s.carId === id
+    ? { glbUrl }
+    : { carId: id, glbUrl, partsConfig: {}, windowsConfig: {}, selectedMesh: null }
+  ),
   selectMesh: (meshName) => set({ selectedMesh: meshName }),
   applyMaterial: (meshName, config) =>
     set(s => ({ partsConfig: { ...s.partsConfig, [meshName]: config } })),
