@@ -12,8 +12,8 @@ export function BrandCard({ brand, count, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#1a1a1a', borderRadius: 16, padding: 20,
-          marginBottom: 12, borderWidth: 1, borderColor: '#2a2a2a' },
+  card: { backgroundColor: '#141414', borderRadius: 16, padding: 20,
+          marginBottom: 12, borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)' },
   brand: { color: '#fff', fontSize: 18, fontWeight: '700' },
-  count: { color: '#888', fontSize: 14, marginTop: 4 },
+  count: { color: '#666', fontSize: 14, marginTop: 4 },
 })

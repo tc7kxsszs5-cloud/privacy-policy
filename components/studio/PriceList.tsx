@@ -26,11 +26,11 @@ export function PriceList({ items }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#141414',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#2a2a2a',
+    borderColor: 'rgba(201,168,76,0.12)',
   },
   title: { color: '#fff', fontSize: 16, fontWeight: '700', marginBottom: 12 },
   row: {
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: '#2a2a2a' },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: 'rgba(201,168,76,0.12)' },
   itemName: { color: '#ccc', fontSize: 14, flex: 1 },
-  price: { color: '#e63946', fontSize: 14, fontWeight: '600' },
+  price: { color: '#C9A84C', fontSize: 14, fontWeight: '600' },
 })

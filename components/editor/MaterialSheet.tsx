@@ -66,19 +66,19 @@ export const MaterialSheet = forwardRef<BottomSheet, Props>(({ meshName, onSelec
 })
 
 const styles = StyleSheet.create({
-  sheetBg: { backgroundColor: '#1a1a1a' },
-  handle: { backgroundColor: '#444' },
+  sheetBg: { backgroundColor: '#141414' },
+  handle: { backgroundColor: 'rgba(201,168,76,0.3)' },
   container: { flex: 1, padding: 16 },
   title: { color: '#fff', fontSize: 16, fontWeight: '600', marginBottom: 12 },
   tabs: { flexGrow: 0, marginBottom: 12 },
   tab: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
-         borderWidth: 1, borderColor: '#333', marginRight: 8 },
-  tabActive: { borderColor: '#e63946', backgroundColor: '#1a0507' },
-  tabText: { color: '#888', fontSize: 13 },
-  tabTextActive: { color: '#e63946' },
+         borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)', marginRight: 8 },
+  tabActive: { borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,0.1)' },
+  tabText: { color: '#666', fontSize: 13 },
+  tabTextActive: { color: '#C9A84C' },
   grid: { paddingBottom: 24 },
   swatch: { width: '18%', aspectRatio: 1, borderRadius: 10, margin: '1%',
-            justifyContent: 'flex-end', padding: 4, borderWidth: 1, borderColor: '#333' },
+            justifyContent: 'flex-end', padding: 4, borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)' },
   swatchLabel: { color: '#fff', fontSize: 9, textShadowColor: '#000',
                  textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
 })

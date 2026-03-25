@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { SERVICES } from '@/constants/services-data'
@@ -27,17 +27,28 @@ export default function ServiceDetailScreen() {
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+      {/* Back button over hero */}
+      <View style={styles.backRow}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Text style={styles.back}>← Назад</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{service.category}</Text>
-        <View style={{ width: 60 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Service title */}
-        <Text style={styles.serviceTitle}>{service.title}</Text>
+        {/* Hero */}
+        {service.image ? (
+          <ImageBackground source={service.image} style={styles.hero} resizeMode="cover">
+            <View style={styles.heroOverlay}>
+              <Text style={styles.heroCategory}>{service.category}</Text>
+              <Text style={styles.heroTitle}>{service.title}</Text>
+            </View>
+          </ImageBackground>
+        ) : (
+          <View style={styles.heroPlaceholder}>
+            <Text style={styles.heroCategory}>{service.category}</Text>
+            <Text style={styles.heroTitle}>{service.title}</Text>
+          </View>
+        )}
 
         {/* Description block */}
         <View style={styles.descBlock}>
@@ -70,33 +81,59 @@ export default function ServiceDetailScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#0a0a0a' },
+
+  backRow: {
+    position: 'absolute', top: 56, left: 0, right: 0, zIndex: 10,
+    paddingHorizontal: 20, paddingVertical: 4,
+  },
+  backBtn: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 14, paddingVertical: 7,
+    borderRadius: 20,
+  },
+  back: { color: '#C9A84C', fontSize: 15, fontWeight: '600' },
+
+  scroll: { paddingBottom: 56 },
+
+  hero: { width: '100%', height: 240 },
+  heroOverlay: {
+    flex: 1, justifyContent: 'flex-end',
+    paddingHorizontal: 20, paddingBottom: 20,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  heroPlaceholder: {
+    height: 200, justifyContent: 'flex-end',
+    paddingHorizontal: 20, paddingBottom: 20,
+    backgroundColor: '#111',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(201,168,76,0.15)',
+  },
+  heroCategory: {
+    color: '#C9A84C', fontSize: 12, fontWeight: '700',
+    letterSpacing: 1.5, marginBottom: 8, textTransform: 'uppercase',
+  },
+  heroTitle: {
+    color: '#fff', fontSize: 22, fontWeight: '800', lineHeight: 30,
+  },
+
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingVertical: 16,
   },
-  back: { color: '#C9A84C', fontSize: 16 },
   title: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  scroll: { padding: 20, paddingBottom: 56 },
-
-  serviceTitle: {
-    color: '#fff', fontSize: 22, fontWeight: '800',
-    lineHeight: 30, marginBottom: 20,
-  },
 
   descBlock: {
     borderLeftWidth: 3, borderLeftColor: '#C9A84C',
-    paddingLeft: 16, marginBottom: 32,
+    paddingLeft: 16, marginHorizontal: 20, marginTop: 24, marginBottom: 32,
     backgroundColor: 'rgba(201,168,76,0.05)',
     borderRadius: 4, paddingVertical: 14, paddingRight: 14,
   },
-  descText: {
-    color: '#ccc', fontSize: 15, lineHeight: 24,
-  },
+  descText: { color: '#ccc', fontSize: 15, lineHeight: 24 },
 
   priceSection: {
     backgroundColor: '#141414', borderRadius: 16,
     borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)',
-    overflow: 'hidden', marginBottom: 24,
+    overflow: 'hidden', marginHorizontal: 20, marginBottom: 24,
   },
   priceSectionLabel: {
     color: '#C9A84C', fontSize: 11, fontWeight: '700',
@@ -113,11 +150,11 @@ const styles = StyleSheet.create({
 
   cta: {
     backgroundColor: '#C9A84C', borderRadius: 16,
-    padding: 18, alignItems: 'center', marginBottom: 16,
+    padding: 18, alignItems: 'center', marginHorizontal: 20, marginBottom: 16,
   },
   ctaText: { color: '#000', fontSize: 16, fontWeight: '800' },
 
-  footnote: { color: '#444', fontSize: 12, textAlign: 'center', lineHeight: 18 },
+  footnote: { color: '#444', fontSize: 12, textAlign: 'center', lineHeight: 18, paddingHorizontal: 20 },
 
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   notFoundText: { color: '#555', fontSize: 16 },

@@ -53,7 +53,7 @@ export default function SupportScreen() {
             <Text style={styles.contactBtnText}>WhatsApp</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.contactBtn, { backgroundColor: '#333' }]}
+            style={[styles.contactBtn, { backgroundColor: '#141414', borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)' }]}
             onPress={() => Linking.openURL(`tel:${STUDIO_INFO.phone}`)}
           >
             <Text style={styles.contactBtnText}>Позвонить</Text>
@@ -73,19 +73,19 @@ export default function SupportScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f0f' },
+  root: { flex: 1, backgroundColor: '#0a0a0a' },
   scroll: { padding: 20, paddingBottom: 48 },
   backBtn: { marginBottom: 24 },
-  backText: { color: '#888', fontSize: 16 },
+  backText: { color: '#C9A84C', fontSize: 16 },
   title: { color: '#fff', fontSize: 28, fontWeight: '800', marginBottom: 4 },
-  subtitle: { color: '#e63946', fontSize: 16, marginBottom: 32 },
+  subtitle: { color: '#C9A84C', fontSize: 16, marginBottom: 32 },
   contacts: { flexDirection: 'row', gap: 10, marginBottom: 36 },
   contactBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
   contactBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  faqTitle: { color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 16 },
+  faqTitle: { color: '#C9A84C', fontSize: 18, fontWeight: '700', marginBottom: 16, letterSpacing: 0.5 },
   faqItem: {
-    backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16,
-    borderWidth: 1, borderColor: '#2a2a2a', marginBottom: 12,
+    backgroundColor: '#141414', borderRadius: 16, padding: 16,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)', marginBottom: 12,
   },
   faqQ: { color: '#fff', fontSize: 15, fontWeight: '600', marginBottom: 8 },
   faqA: { color: '#888', fontSize: 14, lineHeight: 22 },

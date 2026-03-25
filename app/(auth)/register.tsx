@@ -21,10 +21,10 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Регистрация</Text>
-      <TextInput style={styles.input} placeholder="Email" value={email}
+      <Text style={styles.title}>DETAILING TIME</Text>
+      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#555" value={email}
         onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
-      <TextInput style={styles.input} placeholder="Пароль" value={password}
+      <TextInput style={styles.input} placeholder="Пароль" placeholderTextColor="#555" value={password}
         onChangeText={setPassword} secureTextEntry />
 
       <Text style={styles.label}>Я:</Text>
@@ -50,18 +50,18 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#0f0f0f' },
-  title: { fontSize: 28, fontWeight: '700', color: '#fff', textAlign: 'center', marginBottom: 40 },
-  input: { backgroundColor: '#1a1a1a', color: '#fff', borderRadius: 12, padding: 16,
-           marginBottom: 12, fontSize: 16, borderWidth: 1, borderColor: '#333' },
-  label: { color: '#888', marginBottom: 8 },
+  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#0a0a0a' },
+  title: { fontSize: 22, fontWeight: '700', color: '#C9A84C', textAlign: 'center', marginBottom: 40, letterSpacing: 4 },
+  input: { backgroundColor: '#141414', color: '#fff', borderRadius: 12, padding: 16,
+           marginBottom: 12, fontSize: 16, borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)' },
+  label: { color: '#C9A84C', marginBottom: 8 },
   roleRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
   roleBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1,
-             borderColor: '#333', alignItems: 'center' },
-  roleBtnActive: { borderColor: '#e63946', backgroundColor: '#1a0507' },
-  roleBtnText: { color: '#888', fontWeight: '600' },
-  roleBtnTextActive: { color: '#e63946' },
-  button: { backgroundColor: '#e63946', borderRadius: 12, padding: 16, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  link: { color: '#888', textAlign: 'center', marginTop: 20 },
+             borderColor: 'rgba(201,168,76,0.2)', alignItems: 'center' },
+  roleBtnActive: { borderColor: '#C9A84C', backgroundColor: '#141414' },
+  roleBtnText: { color: '#555', fontWeight: '600' },
+  roleBtnTextActive: { color: '#C9A84C' },
+  button: { backgroundColor: '#C9A84C', borderRadius: 12, padding: 16, alignItems: 'center' },
+  buttonText: { color: '#000', fontWeight: '800', fontSize: 16 },
+  link: { color: '#C9A84C', textAlign: 'center', marginTop: 20 },
 })

@@ -45,7 +45,7 @@ export default function OrdersScreen() {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator color="#e63946" />
+          <ActivityIndicator color="#C9A84C" />
         </View>
       ) : orders.length === 0 ? (
         <View style={styles.center}>
@@ -70,19 +70,19 @@ export default function OrdersScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f0f' },
+  root: { flex: 1, backgroundColor: '#0a0a0a' },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingVertical: 16,
   },
-  backText: { color: '#888', fontSize: 16 },
+  backText: { color: '#C9A84C', fontSize: 16 },
   title: { color: '#fff', fontSize: 18, fontWeight: '700' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
   emptyText: { color: '#fff', fontSize: 18, fontWeight: '600', marginBottom: 8, textAlign: 'center' },
   emptySubtext: { color: '#888', fontSize: 14, textAlign: 'center', marginBottom: 24 },
-  ctaBtn: { backgroundColor: '#e63946', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12 },
-  ctaBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  loginBtn: { backgroundColor: '#1a1a1a', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: '#333' },
+  ctaBtn: { backgroundColor: '#C9A84C', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12 },
+  ctaBtnText: { color: '#000', fontWeight: '800', fontSize: 15 },
+  loginBtn: { backgroundColor: '#141414', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)' },
   loginBtnText: { color: '#fff', fontWeight: '600' },
   list: { padding: 20 },
 })

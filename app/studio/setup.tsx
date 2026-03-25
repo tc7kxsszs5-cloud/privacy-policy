@@ -61,7 +61,7 @@ export default function StudioSetupScreen() {
     </View>
   )
 
-  if (loading) return <View style={styles.center}><ActivityIndicator color="#e63946" /></View>
+  if (loading) return <View style={styles.center}><ActivityIndicator color="#C9A84C" /></View>
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
@@ -87,21 +87,21 @@ export default function StudioSetupScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f0f' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f0f0f' },
+  root: { flex: 1, backgroundColor: '#0a0a0a' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' },
   scroll: { padding: 20, paddingBottom: 48 },
   backBtn: { marginBottom: 24 },
-  backText: { color: '#888', fontSize: 16 },
-  title: { color: '#fff', fontSize: 24, fontWeight: '800', marginBottom: 28 },
+  backText: { color: '#C9A84C', fontSize: 16 },
+  title: { color: '#C9A84C', fontSize: 24, fontWeight: '800', marginBottom: 28, letterSpacing: 0.5 },
   field: { marginBottom: 20 },
-  label: { color: '#888', fontSize: 13, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
+  label: { color: '#C9A84C', fontSize: 13, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
   input: {
-    backgroundColor: '#1a1a1a', borderRadius: 12, padding: 16,
-    color: '#fff', fontSize: 16, borderWidth: 1, borderColor: '#2a2a2a',
+    backgroundColor: '#141414', borderRadius: 12, padding: 16,
+    color: '#fff', fontSize: 16, borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
   },
   saveBtn: {
-    backgroundColor: '#e63946', padding: 18, borderRadius: 16,
+    backgroundColor: '#C9A84C', padding: 18, borderRadius: 16,
     alignItems: 'center', marginTop: 8,
   },
-  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  saveBtnText: { color: '#000', fontSize: 16, fontWeight: '800' },
 })

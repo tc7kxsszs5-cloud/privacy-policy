@@ -18,7 +18,7 @@ export default function CatalogScreen() {
     })
   }, [])
 
-  if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#e63946" />
+  if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#C9A84C" />
 
   return (
     <View style={styles.container}>
@@ -36,6 +36,6 @@ export default function CatalogScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f0f', padding: 16, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: '#0a0a0a', padding: 16, paddingTop: 60 },
   title: { color: '#fff', fontSize: 24, fontWeight: '700', marginBottom: 24 },
 })

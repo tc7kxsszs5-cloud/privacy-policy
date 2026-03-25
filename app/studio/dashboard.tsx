@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, 
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getStudioOrders, updateOrderStatus } from '@/constants/orders-service'
+import { supabase } from '@/constants/supabase'
 import { OrderCard } from '@/components/studio/OrderCard'
 import { useAuth } from '@/constants/AuthContext'
 import type { Order, OrderStatus } from '@/constants/orders-service'
@@ -27,7 +28,15 @@ export default function StudioDashboard() {
 
   useEffect(() => {
     if (!user || profile?.role !== 'studio_owner') { setLoading(false); return }
-    getStudioOrders(user.id)
+    supabase
+      .from('studio_profiles')
+      .select('id')
+      .limit(1)
+      .single()
+      .then(({ data: studio }) => {
+        if (studio?.id) return getStudioOrders(studio.id)
+        return []
+      })
       .then(setOrders)
       .finally(() => setLoading(false))
   }, [user, profile])
@@ -59,7 +68,7 @@ export default function StudioDashboard() {
       </View>
 
       {loading ? (
-        <View style={styles.center}><ActivityIndicator color="#e63946" /></View>
+        <View style={styles.center}><ActivityIndicator color="#C9A84C" /></View>
       ) : (
         <FlatList
           data={orders}
@@ -100,23 +109,23 @@ export default function StudioDashboard() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f0f' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f0f0f' },
+  root: { flex: 1, backgroundColor: '#0a0a0a' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' },
   errorText: { color: '#888', fontSize: 16 },
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 20, paddingVertical: 16,
   },
-  title: { color: '#fff', fontSize: 24, fontWeight: '800' },
-  setupText: { color: '#e63946', fontSize: 14 },
+  title: { color: '#fff', fontSize: 24, fontWeight: '800', letterSpacing: 0.5 },
+  setupText: { color: '#C9A84C', fontSize: 14 },
   list: { padding: 20, paddingBottom: 48 },
   emptyBlock: { padding: 32, alignItems: 'center' },
   emptyText: { color: '#888', fontSize: 16 },
   actionBtn: {
-    backgroundColor: '#e63946', padding: 12, borderRadius: 10,
+    backgroundColor: '#C9A84C', padding: 12, borderRadius: 10,
     alignItems: 'center', marginTop: -4, marginBottom: 8,
   },
-  actionBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  actionBtnText: { color: '#000', fontWeight: '800', fontSize: 14 },
   cancelBtn: { padding: 8, alignItems: 'center', marginBottom: 16 },
   cancelBtnText: { color: '#555', fontSize: 13 },
 })

@@ -41,9 +41,9 @@ export const TintSheet = forwardRef<BottomSheet, Props>(({ windowsConfig, onTint
                 step={5}
                 value={tint}
                 onValueChange={v => onTintChange(g.meshName, Math.round(v))}
-                minimumTrackTintColor="#e63946"
-                maximumTrackTintColor="#333"
-                thumbTintColor="#e63946"
+                minimumTrackTintColor="#C9A84C"
+                maximumTrackTintColor="rgba(201,168,76,0.15)"
+                thumbTintColor="#C9A84C"
               />
             </View>
           )
@@ -54,14 +54,14 @@ export const TintSheet = forwardRef<BottomSheet, Props>(({ windowsConfig, onTint
 })
 
 const styles = StyleSheet.create({
-  sheetBg: { backgroundColor: '#1a1a1a' },
-  handle: { backgroundColor: '#444' },
+  sheetBg: { backgroundColor: '#141414' },
+  handle: { backgroundColor: 'rgba(201,168,76,0.3)' },
   container: { padding: 16, paddingBottom: 32 },
   title: { color: '#fff', fontSize: 16, fontWeight: '600', marginBottom: 16 },
   row: { marginBottom: 16 },
   rowLabel: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
   glassName: { color: '#ccc', fontSize: 14 },
-  tintValue: { color: '#e63946', fontSize: 14, fontWeight: '600' },
-  tintPreview: { height: 20, backgroundColor: '#111', borderRadius: 4, marginBottom: 4 },
+  tintValue: { color: '#C9A84C', fontSize: 14, fontWeight: '600' },
+  tintPreview: { height: 20, backgroundColor: '#0a0a0a', borderRadius: 4, marginBottom: 4 },
   slider: { width: '100%', height: 32 },
 })

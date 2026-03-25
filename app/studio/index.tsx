@@ -20,7 +20,7 @@ export default function StudioProfileScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator color="#e63946" />
+        <ActivityIndicator color="#C9A84C" />
       </View>
     )
   }
@@ -89,37 +89,37 @@ export default function StudioProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0f0f0f' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f0f0f' },
+  root: { flex: 1, backgroundColor: '#0a0a0a' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' },
   scroll: { padding: 20, paddingBottom: 48 },
   backBtn: { marginBottom: 20 },
-  backText: { color: '#888', fontSize: 16 },
+  backText: { color: '#C9A84C', fontSize: 16 },
   hero: { alignItems: 'center', marginBottom: 32 },
   logoPlaceholder: {
     width: 80, height: 80, borderRadius: 40,
-    backgroundColor: '#e63946', justifyContent: 'center', alignItems: 'center', marginBottom: 16,
+    backgroundColor: '#C9A84C', justifyContent: 'center', alignItems: 'center', marginBottom: 16,
   },
-  logoLetter: { color: '#fff', fontSize: 36, fontWeight: '800' },
+  logoLetter: { color: '#000', fontSize: 36, fontWeight: '800' },
   studioName: { color: '#fff', fontSize: 28, fontWeight: '800', marginBottom: 8 },
   studioDesc: { color: '#888', fontSize: 15, textAlign: 'center', lineHeight: 22 },
   infoBlock: {
-    backgroundColor: '#1a1a1a', borderRadius: 16, padding: 16,
-    borderWidth: 1, borderColor: '#2a2a2a', marginBottom: 16,
+    backgroundColor: '#141414', borderRadius: 16, padding: 16,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)', marginBottom: 16,
   },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
-  infoLabel: { color: '#888', fontSize: 14 },
+  infoLabel: { color: '#C9A84C', fontSize: 14 },
   infoValue: { color: '#fff', fontSize: 14, flex: 1, textAlign: 'right' },
-  link: { color: '#e63946' },
+  link: { color: '#C9A84C' },
   contacts: { flexDirection: 'row', gap: 12, marginBottom: 24 },
   contactBtn: {
     flex: 1, padding: 14, borderRadius: 12,
-    borderWidth: 1, borderColor: '#333', alignItems: 'center',
+    backgroundColor: '#141414', borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)', alignItems: 'center',
   },
   contactBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   section: { marginBottom: 24 },
   ctaBtn: {
-    backgroundColor: '#e63946', padding: 18, borderRadius: 16,
+    backgroundColor: '#C9A84C', padding: 18, borderRadius: 16,
     alignItems: 'center', marginTop: 8,
   },
-  ctaBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  ctaBtnText: { color: '#000', fontSize: 16, fontWeight: '800' },
 })

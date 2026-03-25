@@ -4,7 +4,7 @@ import type { AppRouter } from '@/backend/trpc/app-router'
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: `${process.env.EXPO_PUBLIC_API_URL}/trpc`,
+      url: 'https://backend-three-mauve-67.vercel.app/api/trpc',
     }),
   ],
 })

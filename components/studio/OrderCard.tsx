@@ -50,12 +50,12 @@ export function OrderCard({ order, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#141414',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#2a2a2a',
+    borderColor: 'rgba(201,168,76,0.12)',
   },
   header: {
     flexDirection: 'row',

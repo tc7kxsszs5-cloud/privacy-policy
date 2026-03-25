@@ -18,11 +18,11 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f0f', justifyContent: 'center',
+  container: { flex: 1, backgroundColor: '#0a0a0a', justifyContent: 'center',
                alignItems: 'center', padding: 24 },
   name: { color: '#fff', fontSize: 24, fontWeight: '700', marginBottom: 8 },
-  role: { color: '#888', fontSize: 16, marginBottom: 48 },
-  button: { backgroundColor: '#333', borderRadius: 12, paddingVertical: 14,
-            paddingHorizontal: 40 },
-  buttonText: { color: '#fff', fontSize: 16 },
+  role: { color: '#666', fontSize: 16, marginBottom: 48 },
+  button: { backgroundColor: '#141414', borderRadius: 12, paddingVertical: 14,
+            paddingHorizontal: 40, borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)' },
+  buttonText: { color: '#C9A84C', fontSize: 16 },
 })

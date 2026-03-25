@@ -19,7 +19,7 @@ export default function GenerationsScreen() {
     })
   }, [brand, model])
 
-  if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#e63946" />
+  if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#C9A84C" />
 
   return (
     <View style={styles.container}>
@@ -30,7 +30,7 @@ export default function GenerationsScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card}
             onPress={() => {
-              const params = new URLSearchParams({ glbUrl: item.glb_url ?? '' })
+              const params = new URLSearchParams({ glbUrl: item.glb_url ?? '', carName: `${brand} ${model}` })
               router.push(`/editor/${item.id}?${params.toString()}`)
             }}>
             <Text style={styles.gen}>{item.generation_name ?? 'Базовая'}</Text>
@@ -45,10 +45,10 @@ export default function GenerationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f0f', padding: 16, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: '#0a0a0a', padding: 16, paddingTop: 60 },
   title: { color: '#fff', fontSize: 24, fontWeight: '700', marginBottom: 24 },
-  card: { backgroundColor: '#1a1a1a', borderRadius: 16, padding: 20,
-          marginBottom: 12, borderWidth: 1, borderColor: '#2a2a2a',
+  card: { backgroundColor: '#141414', borderRadius: 16, padding: 20,
+          marginBottom: 12, borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)',
           flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   gen: { color: '#fff', fontSize: 16, fontWeight: '600' },
   years: { color: '#888', fontSize: 14 },
