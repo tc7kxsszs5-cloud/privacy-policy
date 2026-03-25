@@ -5,15 +5,13 @@ import { trpc } from '@/constants/trpc'
 import { BrandCard } from '@/components/BrandCard'
 
 export default function CatalogScreen() {
-  const [brands, setBrands] = useState<{ name: string; count: number }[]>([])
+  const [brands, setBrands] = useState<{ name: string; count: number; thumbnail_url?: string | null }[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    trpc.cars.list.query().then(cars => {
-      const map: Record<string, number> = {}
-      cars.forEach(c => { map[c.make] = (map[c.make] ?? 0) + 1 })
-      setBrands(Object.entries(map).map(([name, count]) => ({ name, count })))
+    trpc.cars.brands.query().then(data => {
+      setBrands(data)
       setLoading(false)
     })
   }, [])
