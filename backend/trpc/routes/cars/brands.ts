@@ -12,6 +12,7 @@ export const carsBrands = publicProcedure
       .from('cars')
       .select('make, model, thumbnail_url')
       .order('make')
+      .limit(10000)
     if (error) throw new Error(error.message)
 
     const map: Record<string, { count: number; thumbnail_url?: string | null }> = {}
