@@ -221,7 +221,7 @@ export const SERVICES: Service[] = [
     id: 'ceramic',
     category: 'Полировка',
     title: 'Керамическое покрытие (защита до 3 лет)',
-    image: require('@/assets/services/dent_repair.webp'),
+    image: require('@/assets/services/ceramic.jpg'),
     description:
       'Твёрдое защитное покрытие наносится поверх лака или после полировки. Создаёт барьер против химии, птичьего помёта, ультрафиолета и мелких царапин. Автомобиль легче мыть — грязь не прилипает к гладкой керамической поверхности.',
     items: [
@@ -236,7 +236,7 @@ export const SERVICES: Service[] = [
     id: 'liquid_glass',
     category: 'Полировка',
     title: 'Жидкое стекло (защита до 1 года)',
-    image: require('@/assets/services/liquid_glass.webp'),
+    image: require('@/assets/services/liquid_glass.jpg'),
     description:
       'Доступная альтернатива керамике — создаёт стеклоподобную гидрофобную плёнку на кузове. Вода скатывается каплями, грязь смывается с минимальными усилиями. Срок действия до 12 месяцев.',
     items: [
@@ -264,6 +264,7 @@ export const SERVICES: Service[] = [
     id: 'detailing',
     category: 'Детейлинг',
     title: 'Химчистка салона',
+    image: require('@/assets/services/detailing.jpg'),
     description:
       'Полный комплекс работ по восстановлению чистоты интерьера — от обивки сидений до потолка и труднодоступных ниш. Применяем только сертифицированные составы, подобранные под каждый тип материала: ткань, велюр, кожа, алькантара, экокожа.',
     items: [
@@ -296,6 +297,7 @@ export const SERVICES: Service[] = [
     id: 'leather_care',
     category: 'Детейлинг',
     title: 'Защита и уход за кожаным салоном',
+    image: require('@/assets/services/leather_care.jpg'),
     description:
       'Нанесение питательных и защитных составов на кожу и винил. Предотвращает пересыхание, растрескивание и обесцвечивание. Керамический вариант обеспечивает долгосрочную защиту.',
     items: [
@@ -307,7 +309,7 @@ export const SERVICES: Service[] = [
     id: 'glass_repair',
     category: 'Ремонт стёкол',
     title: 'Ремонт лобового стекла (сколы и трещины)',
-    image: require('@/assets/services/polish_headlights.webp'),
+    image: require('@/assets/services/glass_repair2.jpg'),
     description:
       'Устранение сколов и остановка трещин без замены стекла — в день обращения. Небольшой скол под давлением трасс разрастается в трещину на всё стекло. Лучше устранить сейчас.',
     items: [
@@ -392,6 +394,7 @@ export const SERVICES: Service[] = [
     id: 'presale',
     category: 'Детейлинг',
     title: 'Предпродажная подготовка',
+    image: require('@/assets/services/presale.jpg'),
     description:
       'Комплексное восстановление внешнего вида перед продажей: химчистка салона, полировка кузова, устранение мелких дефектов. Автомобиль выглядит как из салона и продаётся быстрее и дороже.',
     items: [
