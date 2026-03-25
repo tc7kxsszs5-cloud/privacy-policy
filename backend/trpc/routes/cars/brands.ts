@@ -8,24 +8,7 @@ const supabase = createClient(
 
 export const carsBrands = publicProcedure
   .query(async () => {
-    const { data, error } = await supabase
-      .from('cars')
-      .select('make, model, thumbnail_url')
-      .order('make')
-      .limit(10000)
+    const { data, error } = await supabase.rpc('get_brands')
     if (error) throw new Error(error.message)
-
-    const map: Record<string, { count: number; thumbnail_url?: string | null }> = {}
-    for (const c of data ?? []) {
-      if (!map[c.make]) map[c.make] = { count: 0, thumbnail_url: c.thumbnail_url }
-      map[c.make].count++
-      if (!map[c.make].thumbnail_url && c.thumbnail_url) {
-        map[c.make].thumbnail_url = c.thumbnail_url
-      }
-    }
-    return Object.entries(map).map(([name, v]) => ({
-      name,
-      count: v.count,
-      thumbnail_url: v.thumbnail_url ?? null,
-    }))
+    return (data ?? []) as { name: string; count: number; thumbnail_url: string | null }[]
   })
