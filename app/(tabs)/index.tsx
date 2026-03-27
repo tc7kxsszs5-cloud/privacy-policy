@@ -72,8 +72,7 @@ export default function HomeScreen() {
             />
             <View style={styles.cardOverlay} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardIcon}>🏎️</Text>
-              <Text style={styles.cardTitle}>3D{'\n'}Конфигуратор</Text>
+              <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>3D Конфигуратор</Text>
               <Text style={styles.cardDesc}>Крути модель, выбирай цвет</Text>
             </View>
           </TouchableOpacity>
@@ -91,8 +90,7 @@ export default function HomeScreen() {
             />
             <View style={styles.cardOverlay} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardIcon}>🚘</Text>
-              <Text style={styles.cardTitle}>Оклейка{'\n'}авто</Text>
+              <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>Оклейка авто</Text>
               <Text style={styles.cardDesc}>Услуги и прайс-лист</Text>
             </View>
           </TouchableOpacity>
@@ -238,10 +236,9 @@ const styles = StyleSheet.create({
   cardContent: {
     flex: 1, padding: 16, justifyContent: 'flex-end',
   },
-  cardIcon: { fontSize: 24, marginBottom: 8 },
   cardTitle: {
-    color: '#fff', fontSize: 18, fontWeight: '800',
-    lineHeight: 22, marginBottom: 6,
+    color: '#fff', fontSize: 16, fontWeight: '800',
+    marginBottom: 6, minWidth: 0,
   },
   cardDesc: { color: 'rgba(255,255,255,0.6)', fontSize: 12, lineHeight: 17 },
 
