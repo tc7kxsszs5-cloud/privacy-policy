@@ -68,7 +68,7 @@ export const SERVICES: Service[] = [
     id: 'hybrid',
     category: 'Оклейка',
     title: 'Гибридная и цветная защитная плёнка',
-    image: require('@/assets/services/interior_repair.webp'),
+    image: require('@/assets/services/hybrid.jpg'),
     description:
       'Гибридная плёнка объединяет защитные свойства полиуретана и декоративные возможности винила. Цветной полиуретан — максимальная защита от механических повреждений с выбором оттенка. Особенно популярны матовые и сатиновые тона: автомобиль меняет облик и при этом надёжно защищён.',
     items: [
@@ -94,7 +94,7 @@ export const SERVICES: Service[] = [
     id: 'interior_wrap',
     category: 'Оклейка салона',
     title: 'Оклейка элементов салона плёнкой',
-    image: require('@/assets/services/hybrid.jpg'),
+    image: require('@/assets/services/interior_wrap.jpg'),
     description:
       'Обновление интерьера без замены деталей. Приборная панель, вставки дверей, центральная консоль — всё это оклеивается за несколько часов. Фактуры: карбон, дерево, матовый металлик, сатин.',
     items: [
@@ -250,7 +250,7 @@ export const SERVICES: Service[] = [
     id: 'polish_headlights',
     category: 'Полировка',
     title: 'Полировка фар и стёкол',
-    image: require('@/assets/services/interior_wrap.webp'),
+    image: require('@/assets/services/polish_headlights.jpg'),
     description:
       'Возвращает прозрачность пожелтевшим и помутневшим фарам без замены. Стёкла — устранение царапин и следов от щёток, восстановление оптической чистоты. Нанесение защитного покрытия замедляет повторное пожелтение.',
     items: [
@@ -309,7 +309,7 @@ export const SERVICES: Service[] = [
     id: 'glass_repair',
     category: 'Ремонт стёкол',
     title: 'Ремонт лобового стекла (сколы и трещины)',
-    image: require('@/assets/services/glass_repair2.jpg'),
+    image: require('@/assets/services/glass_repair.jpg'),
     description:
       'Устранение сколов и остановка трещин без замены стекла — в день обращения. Небольшой скол под давлением трасс разрастается в трещину на всё стекло. Лучше устранить сейчас.',
     items: [
@@ -324,7 +324,7 @@ export const SERVICES: Service[] = [
     id: 'dent_repair',
     category: 'Ремонт кузова',
     title: 'Ремонт вмятин без покраски (PDR)',
-    image: require('@/assets/services/glass_repair.webp'),
+    image: require('@/assets/services/dent_repair.jpg'),
     description:
       'Технология PDR позволяет убрать вмятины изнутри без вскрытия лака. Лакокрасочное покрытие остаётся нетронутым. Подходит для стальных и алюминиевых панелей при сохранении целостности лака.',
     items: [
@@ -338,7 +338,7 @@ export const SERVICES: Service[] = [
     id: 'interior_repair',
     category: 'Ремонт салона',
     title: 'Ремонт и реставрация элементов салона',
-    image: require('@/assets/services/extras.webp'),
+    image: require('@/assets/services/interior_repair.jpg'),
     description:
       'Локальное восстановление кожи, ткани, велюра и пластика без полной замены деталей. Покраска с подбором цвета в тон оригинала. Ремонт прожогов, порезов, потёртостей, трещин.',
     items: [
@@ -356,7 +356,7 @@ export const SERVICES: Service[] = [
     id: 'moto_detailing',
     category: 'Мото',
     title: 'Детейлинг и оклейка мотоцикла, снегохода, квадроцикла',
-    image: require('@/assets/services/ceramic.jpg'),
+    image: require('@/assets/services/moto_detailing.jpg'),
     description:
       'Полировка и оклейка мотоциклов, снегоходов, квадроциклов и шлемов. Виниловая или полиуретановая плёнка — смена дизайна и защита пластика по индивидуальному эскизу. Полировка всех металлических и пластиковых деталей: двигатель, хром, алюминий, коллектор, выхлоп.',
     items: [
@@ -380,7 +380,7 @@ export const SERVICES: Service[] = [
     id: 'extras',
     category: 'Дополнительно',
     title: 'Дополнительные услуги',
-    image: require('@/assets/services/moto_detailing.webp'),
+    image: require('@/assets/services/extras.jpg'),
     description:
       'Установка защитных сеток в бампер и шумоизоляция — практичные решения для комфорта и защиты автомобиля.',
     items: [
