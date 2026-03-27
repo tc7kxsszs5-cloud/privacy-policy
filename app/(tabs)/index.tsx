@@ -3,12 +3,6 @@ import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth } from '@/constants/AuthContext'
 
-const FEATURES = [
-  { icon: '🏎️', title: '3D Конфигуратор', desc: 'Крути модель, выбирай цвет на каждую деталь', route: '/catalog' },
-  { icon: '🚘', title: 'Оклейка авто', desc: 'Услуги и прайс-лист студии', route: '/prices' },
-  { icon: '📋', title: 'Заявка онлайн', desc: 'Отправь конфигурацию — приедь и оплати', route: '/orders' },
-]
-
 export default function HomeScreen() {
   const router = useRouter()
   const { user, profile } = useAuth()
@@ -16,6 +10,8 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+
+        {/* ── NAV ── */}
         <View style={styles.nav}>
           <View>
             <Text style={styles.logo}>DETAILING TIME</Text>
@@ -35,69 +31,147 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.hero}>
-          <Text style={styles.heroTag}>Студия оклейки авто</Text>
-          <Text style={styles.heroTitle}>Создай{'\n'}свой{'\n'}стиль</Text>
-          <Text style={styles.heroDesc}>
-            Выбери автомобиль, настрой цвет в 3D и отправь заявку.{'\n'}Оплата — в студии.
-          </Text>
-          <TouchableOpacity style={styles.heroCta} onPress={() => router.push('/catalog')}>
-            <Text style={styles.heroCtaText}>Попробовать →</Text>
+        {/* ── HERO ── */}
+        <TouchableOpacity
+          style={styles.heroCard}
+          onPress={() => router.push('/catalog')}
+          activeOpacity={0.92}
+        >
+          <Image
+            source={require('@/assets/services/presale.jpg')}
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
+          <View style={styles.heroOverlay} />
+          <View style={styles.heroContent}>
+            <Text style={styles.heroTag}>Студия оклейки авто · Москва</Text>
+            <Text style={styles.heroTitle}>Создай{'\n'}свой{'\n'}стиль</Text>
+            <Text style={styles.heroDesc}>
+              Выбери автомобиль, настрой цвет в 3D{'\n'}и отправь заявку. Оплата — в студии.
+            </Text>
+            <View style={styles.heroCtaRow}>
+              <View style={styles.heroCta}>
+                <Text style={styles.heroCtaText}>Попробовать →</Text>
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        {/* ── CARDS ROW 1: две узкие ── */}
+        <View style={styles.row}>
+          {/* 3D Конфигуратор */}
+          <TouchableOpacity
+            style={[styles.halfCard, { marginRight: 6 }]}
+            onPress={() => router.push('/catalog')}
+            activeOpacity={0.85}
+          >
+            <Image
+              source={require('@/assets/services/vinyl.jpg')}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <View style={styles.cardOverlay} />
+            <View style={styles.cardContent}>
+              <Text style={styles.cardIcon}>🏎️</Text>
+              <Text style={styles.cardTitle}>3D{'\n'}Конфигуратор</Text>
+              <Text style={styles.cardDesc}>Крути модель, выбирай цвет</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Оклейка авто */}
+          <TouchableOpacity
+            style={[styles.halfCard, { marginLeft: 6 }]}
+            onPress={() => router.push('/prices')}
+            activeOpacity={0.85}
+          >
+            <Image
+              source={require('@/assets/services/ppf.jpg')}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+            <View style={styles.cardOverlay} />
+            <View style={styles.cardContent}>
+              <Text style={styles.cardIcon}>🚘</Text>
+              <Text style={styles.cardTitle}>Оклейка{'\n'}авто</Text>
+              <Text style={styles.cardDesc}>Услуги и прайс-лист</Text>
+            </View>
           </TouchableOpacity>
         </View>
 
-        {/* Лекальная нарезка — featured card */}
+        {/* ── ЛЕКАЛЬНАЯ НАРЕЗКА — широкая ── */}
         <TouchableOpacity
-          style={styles.lekalaCard}
+          style={styles.wideCard}
           onPress={() => router.push('/prices/lekala_cut' as any)}
           activeOpacity={0.88}
         >
           <Image
             source={require('@/assets/services/ppf_cut.jpg')}
-            style={styles.lekalaImage}
+            style={styles.wideImage}
             resizeMode="cover"
           />
-          {/* тёмный оверлей сверху */}
-          <View style={styles.lekalaOverlayTop} />
-          {/* тёмный оверлей снизу — основной */}
-          <View style={styles.lekalaOverlayBottom} />
-          <View style={styles.lekalaContent}>
-            <View style={styles.lekalaBadge}>
-              <Text style={styles.lekalaBadgeText}>ТЕХНОЛОГИЯ</Text>
+          <View style={styles.wideOverlayTop} />
+          <View style={styles.wideOverlayBottom} />
+          <View style={styles.wideContent}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>ТЕХНОЛОГИЯ</Text>
             </View>
-            <Text style={styles.lekalaTitle}>Лекальная нарезка{'\n'}плёнки</Text>
-            <Text style={styles.lekalaDesc}>
-              Плоттер режет по точным цифровым шаблонам — PPF, тонировка, винил. Нет ножа по краске, нет зазубрин, идеальный край.
+            <Text style={styles.wideTitle}>Лекальная нарезка{'\n'}плёнки</Text>
+            <Text style={styles.wideDesc}>
+              Плоттер режет по точным цифровым шаблонам — PPF, тонировка, винил. Нет ножа по краске, нет зазубрин.
             </Text>
-            <View style={styles.lekalaFooter}>
-              <Text style={styles.lekalaLink}>Подробнее</Text>
-              <Text style={styles.lekalaArrow}>→</Text>
-            </View>
+            <Text style={styles.wideLink}>Подробнее →</Text>
           </View>
         </TouchableOpacity>
 
-        <View style={styles.features}>
-          {FEATURES.map((f, i) => (
-            <TouchableOpacity key={i} style={styles.featureCard} onPress={() => router.push(f.route as any)} activeOpacity={0.7}>
-              <Text style={styles.featureIcon}>{f.icon}</Text>
-              <Text style={styles.featureTitle}>{f.title}</Text>
-              <Text style={styles.featureDesc}>{f.desc}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <TouchableOpacity style={styles.studioCta} onPress={() => router.push('/studio')}>
-          <View>
-            <Text style={styles.studioCtaLabel}>О студии</Text>
-            <Text style={styles.studioCtaTitle}>Флор</Text>
-            <Text style={styles.studioCtaDesc}>Прайс-лист, адрес, контакты →</Text>
+        {/* ── ЗАЯВКА ОНЛАЙН — широкая ── */}
+        <TouchableOpacity
+          style={styles.wideCard}
+          onPress={() => router.push('/orders')}
+          activeOpacity={0.88}
+        >
+          <Image
+            source={require('@/assets/services/ceramic.jpg')}
+            style={styles.wideImage}
+            resizeMode="cover"
+          />
+          <View style={styles.wideOverlayTop} />
+          <View style={styles.wideOverlayBottom} />
+          <View style={styles.wideContent}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>ЗАЯВКА ОНЛАЙН</Text>
+            </View>
+            <Text style={styles.wideTitle}>Отправь конфигурацию</Text>
+            <Text style={styles.wideDesc}>
+              Настрой авто в 3D — приедь и оплати уже готовую работу. Без предоплаты.
+            </Text>
+            <Text style={styles.wideLink}>Оставить заявку →</Text>
           </View>
-          <Text style={styles.studioCtaArrow}>→</Text>
+        </TouchableOpacity>
+
+        {/* ── СТУДИЯ ── */}
+        <TouchableOpacity
+          style={styles.studioCard}
+          onPress={() => router.push('/studio')}
+          activeOpacity={0.88}
+        >
+          <Image
+            source={require('@/assets/services/moto_detailing.jpg')}
+            style={styles.studioImage}
+            resizeMode="cover"
+          />
+          <View style={styles.studioOverlay} />
+          <View style={styles.studioContent}>
+            <Text style={styles.studioLabel}>О студии</Text>
+            <Text style={styles.studioName}>Флор</Text>
+            <Text style={styles.studioAddress}>ул. Маршала Прошлякова, 14к2 · Москва</Text>
+            <Text style={styles.studioLink}>Прайс-лист, адрес, контакты →</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.supportLink} onPress={() => router.push('/support')}>
           <Text style={styles.supportLinkText}>Служба поддержки</Text>
         </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   )
@@ -105,73 +179,125 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#0a0a0a' },
-  scroll: { padding: 20, paddingBottom: 48 },
-  nav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 48 },
-  logo: { color: '#C9A84C', fontSize: 18, fontWeight: '900', letterSpacing: 3, textTransform: 'uppercase' },
-  logoSub: { color: '#666', fontSize: 11, letterSpacing: 1, marginTop: 2 },
+  scroll: { padding: 16, paddingBottom: 48 },
+
+  // NAV
+  nav: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', marginBottom: 20,
+  },
+  logo: { color: '#C9A84C', fontSize: 18, fontWeight: '900', letterSpacing: 3 },
+  logoSub: { color: '#555', fontSize: 11, letterSpacing: 1, marginTop: 2 },
   navRight: { flexDirection: 'row', gap: 20 },
   navLink: { color: '#888', fontSize: 15 },
-  hero: { marginBottom: 48 },
-  heroTag: { color: '#C9A84C', fontSize: 13, fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 16 },
-  heroTitle: { color: '#fff', fontSize: 64, fontWeight: '900', lineHeight: 68, marginBottom: 20 },
-  heroDesc: { color: '#888', fontSize: 16, lineHeight: 26, marginBottom: 32 },
+
+  // HERO
+  heroCard: {
+    borderRadius: 24, overflow: 'hidden',
+    marginBottom: 12, height: 420,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)',
+  },
+  heroImage: { position: 'absolute', width: '100%', height: '100%' },
+  heroOverlay: {
+    position: 'absolute', width: '100%', height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.62)',
+  },
+  heroContent: {
+    flex: 1, padding: 28, justifyContent: 'flex-end',
+  },
+  heroTag: {
+    color: '#C9A84C', fontSize: 11, fontWeight: '700',
+    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 12,
+  },
+  heroTitle: {
+    color: '#fff', fontSize: 58, fontWeight: '900',
+    lineHeight: 62, marginBottom: 16,
+  },
+  heroDesc: {
+    color: 'rgba(255,255,255,0.65)', fontSize: 14,
+    lineHeight: 22, marginBottom: 24,
+  },
+  heroCtaRow: { flexDirection: 'row' },
   heroCta: {
-    backgroundColor: '#C9A84C', paddingHorizontal: 32, paddingVertical: 18,
-    borderRadius: 16, alignSelf: 'flex-start',
+    backgroundColor: '#C9A84C', paddingHorizontal: 28,
+    paddingVertical: 15, borderRadius: 14,
   },
-  heroCtaText: { color: '#000', fontSize: 16, fontWeight: '700' },
-  lekalaCard: {
-    borderRadius: 20, overflow: 'hidden', marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(201,168,76,0.25)',
-    height: 240,
+  heroCtaText: { color: '#000', fontSize: 15, fontWeight: '800' },
+
+  // HALF CARDS (2-column row)
+  row: { flexDirection: 'row', marginBottom: 12 },
+  halfCard: {
+    flex: 1, borderRadius: 20, overflow: 'hidden',
+    height: 200, borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)',
   },
-  lekalaImage: { position: 'absolute', width: '100%', height: '100%' },
-  lekalaOverlayTop: {
+  cardImage: { position: 'absolute', width: '100%', height: '100%' },
+  cardOverlay: {
+    position: 'absolute', width: '100%', height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.58)',
+  },
+  cardContent: {
+    flex: 1, padding: 16, justifyContent: 'flex-end',
+  },
+  cardIcon: { fontSize: 24, marginBottom: 8 },
+  cardTitle: {
+    color: '#fff', fontSize: 18, fontWeight: '800',
+    lineHeight: 22, marginBottom: 6,
+  },
+  cardDesc: { color: 'rgba(255,255,255,0.6)', fontSize: 12, lineHeight: 17 },
+
+  // WIDE CARDS
+  wideCard: {
+    borderRadius: 20, overflow: 'hidden',
+    marginBottom: 12, height: 220,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
+  },
+  wideImage: { position: 'absolute', width: '100%', height: '100%' },
+  wideOverlayTop: {
     position: 'absolute', top: 0, left: 0, right: 0, height: 80,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
-  lekalaOverlayBottom: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, height: 180,
-    backgroundColor: 'rgba(0,0,0,0.72)',
+  wideOverlayBottom: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, height: 190,
+    backgroundColor: 'rgba(0,0,0,0.75)',
   },
-  lekalaContent: { flex: 1, padding: 20, justifyContent: 'flex-end' },
-  lekalaBadge: {
+  wideContent: { flex: 1, padding: 20, justifyContent: 'flex-end' },
+  badge: {
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(201,168,76,0.18)',
-    borderWidth: 1, borderColor: 'rgba(201,168,76,0.4)',
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.45)',
     borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginBottom: 10,
   },
-  lekalaBadgeText: {
-    color: '#C9A84C', fontSize: 10, fontWeight: '800', letterSpacing: 1.5,
+  badgeText: { color: '#C9A84C', fontSize: 10, fontWeight: '800', letterSpacing: 1.5 },
+  wideTitle: {
+    color: '#fff', fontSize: 22, fontWeight: '900',
+    lineHeight: 28, marginBottom: 8,
   },
-  lekalaTitle: {
-    color: '#fff', fontSize: 24, fontWeight: '900',
-    lineHeight: 30, marginBottom: 10,
+  wideDesc: { color: 'rgba(255,255,255,0.68)', fontSize: 13, lineHeight: 19, marginBottom: 12 },
+  wideLink: { color: '#C9A84C', fontSize: 14, fontWeight: '700' },
+
+  // STUDIO CARD
+  studioCard: {
+    borderRadius: 20, overflow: 'hidden',
+    height: 180, marginBottom: 16,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
   },
-  lekalaDesc: {
-    color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 20, marginBottom: 14,
+  studioImage: { position: 'absolute', width: '100%', height: '100%' },
+  studioOverlay: {
+    position: 'absolute', width: '100%', height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.65)',
   },
-  lekalaFooter: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  lekalaLink: { color: '#C9A84C', fontSize: 14, fontWeight: '700' },
-  lekalaArrow: { color: '#C9A84C', fontSize: 16, fontWeight: '700' },
-  features: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
-  featureCard: {
-    width: '47%', backgroundColor: '#141414', borderRadius: 16, padding: 16,
-    borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)',
+  studioContent: {
+    flex: 1, padding: 20, justifyContent: 'center',
   },
-  featureIcon: { fontSize: 28, marginBottom: 10 },
-  featureTitle: { color: '#fff', fontSize: 15, fontWeight: '700', marginBottom: 6 },
-  featureDesc: { color: '#888', fontSize: 13, lineHeight: 20 },
-  studioCta: {
-    backgroundColor: '#141414', borderRadius: 20, padding: 20,
-    borderWidth: 1, borderColor: 'rgba(201,168,76,0.12)',
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    marginBottom: 16,
+  studioLabel: {
+    color: '#C9A84C', fontSize: 11, fontWeight: '700',
+    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
   },
-  studioCtaLabel: { color: '#C9A84C', fontSize: 12, fontWeight: '600', textTransform: 'uppercase', marginBottom: 4 },
-  studioCtaTitle: { color: '#fff', fontSize: 22, fontWeight: '800', marginBottom: 4 },
-  studioCtaDesc: { color: '#888', fontSize: 14 },
-  studioCtaArrow: { color: '#C9A84C', fontSize: 28 },
+  studioName: { color: '#fff', fontSize: 28, fontWeight: '900', marginBottom: 4 },
+  studioAddress: { color: 'rgba(255,255,255,0.55)', fontSize: 12, marginBottom: 8 },
+  studioLink: { color: '#C9A84C', fontSize: 13, fontWeight: '600' },
+
+  // SUPPORT
   supportLink: { alignItems: 'center', paddingVertical: 16 },
-  supportLinkText: { color: '#555', fontSize: 14 },
+  supportLinkText: { color: '#444', fontSize: 14 },
 })
