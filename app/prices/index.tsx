@@ -22,23 +22,41 @@ export default function PricesScreen() {
         {SERVICE_CATEGORIES.map(category => {
           const services = SERVICES.filter(s => s.category === category)
           if (services.length === 0) return null
+
+          // Flatten all rows: services without items get a single service-level row
+          type Row = { key: string; label: string; price?: string; serviceId: string; isService?: boolean }
+          const rows: Row[] = []
+          services.forEach(service => {
+            if (service.items.length === 0) {
+              rows.push({ key: service.id, label: service.title, serviceId: service.id, isService: true })
+            } else {
+              service.items.forEach(item => {
+                rows.push({
+                  key: `${service.id}-${item.name}`,
+                  label: item.name,
+                  price: `от ${item.price_from.toLocaleString('ru-RU')} ${item.unit}`,
+                  serviceId: service.id,
+                })
+              })
+            }
+          })
+
           return (
             <View key={category} style={styles.categoryBlock}>
               <Text style={styles.catTitle}>{category}</Text>
-              {services.flatMap(service =>
-                service.items.map(item => ({ ...item, serviceId: service.id }))
-              ).map((item, index) => (
+              {rows.map((row, index) => (
                 <TouchableOpacity
-                  key={`${item.serviceId}-${item.name}`}
+                  key={row.key}
                   style={[styles.row, index > 0 && styles.rowBorder]}
-                  onPress={() => router.push(`/prices/${item.serviceId}`)}
+                  onPress={() => router.push(`/prices/${row.serviceId}`)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.itemName}>{item.name}</Text>
+                  <Text style={[styles.itemName, row.isService && styles.itemNameService]}>{row.label}</Text>
                   <View style={styles.rowRight}>
-                    <Text style={styles.price}>
-                      от {item.price_from.toLocaleString('ru-RU')} {item.unit}
-                    </Text>
+                    {row.price
+                      ? <Text style={styles.price}>{row.price}</Text>
+                      : <Text style={styles.priceOnRequest}>Подробнее</Text>
+                    }
                     <Text style={styles.chevron}>›</Text>
                   </View>
                 </TouchableOpacity>
@@ -81,6 +99,8 @@ const styles = StyleSheet.create({
   },
   rowBorder: { borderTopWidth: 1, borderTopColor: 'rgba(201,168,76,0.08)' },
   itemName: { color: '#ccc', fontSize: 13, flex: 1, marginRight: 8, lineHeight: 18 },
+  itemNameService: { color: '#fff', fontWeight: '600' },
+  priceOnRequest: { color: '#C9A84C', fontSize: 13, fontWeight: '600', textAlign: 'right' },
   rowRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   price: { color: '#fff', fontSize: 13, fontWeight: '600', textAlign: 'right' },
   chevron: { color: '#C9A84C', fontSize: 18, fontWeight: '300', marginTop: -1 },
