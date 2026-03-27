@@ -1,11 +1,10 @@
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth } from '@/constants/AuthContext'
 
 const FEATURES = [
   { icon: '🏎️', title: '3D Конфигуратор', desc: 'Крути модель, выбирай цвет на каждую деталь', route: '/catalog' },
-  { icon: '🎨', title: '78 материалов', desc: 'Глянец, мат, сатин, карбон, хром', route: '/catalog' },
   { icon: '🚘', title: 'Оклейка авто', desc: 'Услуги и прайс-лист студии', route: '/prices' },
   { icon: '📋', title: 'Заявка онлайн', desc: 'Отправь конфигурацию — приедь и оплати', route: '/orders' },
 ]
@@ -46,6 +45,20 @@ export default function HomeScreen() {
             <Text style={styles.heroCtaText}>Попробовать →</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Лекальная нарезка — широкая карточка с фото */}
+        <TouchableOpacity style={styles.lekalaCard} onPress={() => router.push('/prices/lekala_cut' as any)} activeOpacity={0.85}>
+          <Image source={require('@/assets/services/ppf_cut.jpg')} style={styles.lekalaImage} resizeMode="cover" />
+          <View style={styles.lekalaOverlay} />
+          <View style={styles.lekalaContent}>
+            <Text style={styles.lekalaTag}>Технология</Text>
+            <Text style={styles.lekalaTitle}>Лекальная нарезка плёнки</Text>
+            <Text style={styles.lekalaDesc}>
+              Плёнка нарезается на режущем плоттере по цифровым лекалам — точно под вашу марку и модель. Никакого ножа по краске.
+            </Text>
+            <Text style={styles.lekalaLink}>Подробнее →</Text>
+          </View>
+        </TouchableOpacity>
 
         <View style={styles.features}>
           {FEATURES.map((f, i) => (
@@ -91,6 +104,24 @@ const styles = StyleSheet.create({
     borderRadius: 16, alignSelf: 'flex-start',
   },
   heroCtaText: { color: '#000', fontSize: 16, fontWeight: '700' },
+  lekalaCard: {
+    borderRadius: 20, overflow: 'hidden', marginBottom: 12,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
+    height: 220,
+  },
+  lekalaImage: { position: 'absolute', width: '100%', height: '100%' },
+  lekalaOverlay: {
+    position: 'absolute', width: '100%', height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.55)',
+  },
+  lekalaContent: { flex: 1, padding: 20, justifyContent: 'flex-end' },
+  lekalaTag: {
+    color: '#C9A84C', fontSize: 11, fontWeight: '700',
+    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6,
+  },
+  lekalaTitle: { color: '#fff', fontSize: 22, fontWeight: '800', marginBottom: 8, lineHeight: 28 },
+  lekalaDesc: { color: 'rgba(255,255,255,0.75)', fontSize: 13, lineHeight: 19, marginBottom: 12 },
+  lekalaLink: { color: '#C9A84C', fontSize: 14, fontWeight: '700' },
   features: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 24 },
   featureCard: {
     width: '47%', backgroundColor: '#141414', borderRadius: 16, padding: 16,
