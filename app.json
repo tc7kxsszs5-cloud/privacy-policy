@@ -33,7 +33,9 @@
       "router": {},
       "eas": {
         "projectId": "2790e3e9-a6b1-4577-8559-e1e1eff4071e"
-      }
+      },
+      "supabaseUrl": "https://svicokgjtmaukzhapzrr.supabase.co",
+      "supabaseAnonKey": "sb_publishable_ynbvx7h77x7REAn3qmC6Yw_btfv9Sx1"
     },
     "owner": "kiku79"
   }
