@@ -56,17 +56,19 @@ export default function ServiceDetailScreen() {
         </View>
 
         {/* Price list */}
-        <View style={styles.priceSection}>
-          <Text style={styles.priceSectionLabel}>СТОИМОСТЬ</Text>
-          {service.items.map((item, i) => (
-            <View key={item.name} style={[styles.priceRow, i < service.items.length - 1 && styles.priceRowBorder]}>
-              <Text style={styles.priceName}>{item.name}</Text>
-              <Text style={styles.priceValue}>
-                от {item.price_from.toLocaleString('ru-RU')} {item.unit}
-              </Text>
-            </View>
-          ))}
-        </View>
+        {service.items.length > 0 && (
+          <View style={styles.priceSection}>
+            <Text style={styles.priceSectionLabel}>СТОИМОСТЬ</Text>
+            {service.items.map((item, i) => (
+              <View key={item.name} style={[styles.priceRow, i < service.items.length - 1 && styles.priceRowBorder]}>
+                <Text style={styles.priceName}>{item.name}</Text>
+                <Text style={styles.priceValue}>
+                  от {item.price_from.toLocaleString('ru-RU')} {item.unit}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* CTA */}
         <TouchableOpacity style={styles.cta} onPress={() => router.push('/support')}>
