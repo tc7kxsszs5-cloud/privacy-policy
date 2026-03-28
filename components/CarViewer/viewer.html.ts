@@ -248,6 +248,8 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       renderer.render(scene, camera)
     }
     animate()
+
+    sendToRN({ type: 'ready' })
   </script>
 </body>
 </html>\``

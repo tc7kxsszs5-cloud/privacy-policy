@@ -36,6 +36,10 @@ export default function EditorScreen() {
   const GLASS_MESH_PATTERNS = ['glass_', 'Window', 'Windshield', 'windshield', 'window', 'Glass']
 
   const handleViewerMessage = useCallback((msg: WebViewToRN) => {
+    if (msg.type === 'ready') {
+      viewerRef.current?.send({ type: 'load_model', glbUrl: modelUrl })
+      return
+    }
     if (msg.type === 'model_loaded') {
       const { partsConfig, windowsConfig } = useEditorStore.getState()
       Object.entries(partsConfig).forEach(([meshName, { colorHex, finish }]) => {
@@ -59,12 +63,6 @@ export default function EditorScreen() {
     }
   }, [selectMesh])
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      viewerRef.current?.send({ type: 'load_model', glbUrl: modelUrl })
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [modelUrl])
 
   const handleMaterialSelect = useCallback((materialId: string, colorHex: string, finish: any) => {
     if (!selectedMesh) return
