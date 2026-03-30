@@ -1,4 +1,5 @@
 import { Asset } from 'expo-asset'
+import { readAsStringAsync } from 'expo-file-system/legacy'
 import { GLB_ASSETS, GlbKey } from './glb-assets'
 
 // Exact model names from Supabase → GLB key
@@ -23,13 +24,14 @@ const MAPPING: Array<{ key: GlbKey; make: string; models: string[] }> = [
   { key: 'porsche_911_carrera_4s',  make: 'Porsche',        models: ['911', '911 GT2', '911 GT3', '911 R', '911 S/T'] },
 ]
 
-export async function resolveGlbUri(make: string, model: string): Promise<string | null> {
-  const entry = MAPPING.find(
-    m => m.make === make && m.models.includes(model)
-  )
-  if (!entry) return null
+export function getGlbKey(make: string, model: string): GlbKey | null {
+  const entry = MAPPING.find(m => m.make === make && m.models.includes(model))
+  return entry?.key ?? null
+}
 
-  const asset = Asset.fromModule(GLB_ASSETS[entry.key])
+export async function loadGlbDataUri(key: GlbKey): Promise<string> {
+  const asset = Asset.fromModule(GLB_ASSETS[key])
   await asset.downloadAsync()
-  return asset.localUri ?? asset.uri ?? null
+  const base64 = await readAsStringAsync(asset.localUri!, { encoding: 'base64' })
+  return `data:model/gltf-binary;base64,${base64}`
 }

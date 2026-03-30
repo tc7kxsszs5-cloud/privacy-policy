@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Share } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -10,11 +10,13 @@ import { useEditorStore } from '@/constants/editor-store'
 import { WebViewToRN } from '@/components/CarViewer/bridge'
 import { createOrder } from '@/constants/orders-service'
 import { useAuth } from '@/constants/AuthContext'
+import { loadGlbDataUri } from '@/constants/car-glb-map'
+import { GlbKey } from '@/constants/glb-assets'
 
 const DEMO_GLB = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb'
 
 export default function EditorScreen() {
-  const { carId, glbUrl, carName } = useLocalSearchParams<{ carId: string; glbUrl?: string; carName?: string }>()
+  const { carId, glbUrl, glbKey, carName } = useLocalSearchParams<{ carId: string; glbUrl?: string; glbKey?: string; carName?: string }>()
   const router = useRouter()
   const { user } = useAuth()
 
@@ -27,17 +29,32 @@ export default function EditorScreen() {
     setCarId, selectMesh, applyMaterial, applyTint, resetAll,
   } = useEditorStore()
 
-  const modelUrl = glbUrl || DEMO_GLB
+  const [modelUrl, setModelUrl] = useState(glbUrl || DEMO_GLB)
+  const viewerReadyRef = useRef(false)
+  const pendingUrlRef = useRef<string | null>(null)
 
   useEffect(() => {
     setCarId(carId, modelUrl)
+    if (glbKey) {
+      loadGlbDataUri(glbKey as GlbKey).then(dataUri => {
+        if (viewerReadyRef.current) {
+          viewerRef.current?.send({ type: 'load_model', glbUrl: dataUri })
+        } else {
+          pendingUrlRef.current = dataUri
+        }
+        setModelUrl(dataUri)
+      }).catch(() => {})
+    }
   }, [carId])
 
   const GLASS_MESH_PATTERNS = ['glass_', 'Window', 'Windshield', 'windshield', 'window', 'Glass']
 
   const handleViewerMessage = useCallback((msg: WebViewToRN) => {
     if (msg.type === 'ready') {
-      viewerRef.current?.send({ type: 'load_model', glbUrl: modelUrl })
+      viewerReadyRef.current = true
+      const url = pendingUrlRef.current ?? modelUrl
+      viewerRef.current?.send({ type: 'load_model', glbUrl: url })
+      pendingUrlRef.current = null
       return
     }
     if (msg.type === 'model_loaded') {

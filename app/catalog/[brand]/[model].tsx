@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { trpc } from '@/constants/trpc'
-import { resolveGlbUri } from '@/constants/car-glb-map'
+import { getGlbKey } from '@/constants/car-glb-map'
 
 type Car = { id: string; make: string; model: string; year_from: number;
              year_to: number | null; generation_name: string | null; glb_url?: string | null }
@@ -20,10 +20,10 @@ export default function GenerationsScreen() {
     })
   }, [brand, model])
 
-  const handlePress = async (item: Car) => {
-    const glbUri = await resolveGlbUri(brand, model)
+  const handlePress = (item: Car) => {
+    const glbKey = getGlbKey(brand, model)
     const params = new URLSearchParams({
-      glbUrl: glbUri ?? item.glb_url ?? '',
+      ...(glbKey ? { glbKey } : item.glb_url ? { glbUrl: item.glb_url } : {}),
       carName: `${brand} ${model}`,
     })
     router.push(`/editor/${item.id}?${params.toString()}`)
