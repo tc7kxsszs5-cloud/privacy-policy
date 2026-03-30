@@ -98,6 +98,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     // --- State ---
     let carModel = null
     const meshMaterials = {}
+    let highlightedMeshObj = null
 
     // --- Loaders ---
     const dracoLoader = new DRACOLoader()
@@ -121,6 +122,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
           carModel.position.sub(center.multiplyScalar(scale))
           carModel.position.y = 0
 
+          const meshNames = []
           carModel.traverse(child => {
             if (child.isMesh) {
               child.castShadow = true
@@ -128,12 +130,13 @@ export const VIEWER_HTML = `<!DOCTYPE html>
               if (!meshMaterials[child.name]) {
                 meshMaterials[child.name] = child.material.clone()
               }
+              if (child.name) meshNames.push(child.name)
             }
           })
 
           scene.add(carModel)
           document.getElementById('loading').style.display = 'none'
-          sendToRN({ type: 'model_loaded' })
+          sendToRN({ type: 'model_loaded', meshNames })
         },
         undefined,
         (err) => {
@@ -184,8 +187,26 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       })
     }
 
+    function highlightMesh(meshName) {
+      // Remove previous highlight
+      if (highlightedMeshObj && highlightedMeshObj.material) {
+        highlightedMeshObj.material.emissive = new THREE.Color(0x000000)
+        highlightedMeshObj.material.emissiveIntensity = 0
+        highlightedMeshObj = null
+      }
+      if (!meshName || !carModel) return
+      carModel.traverse(child => {
+        if (child.isMesh && child.name === meshName && child.material) {
+          child.material.emissive = new THREE.Color(0xC9A84C)
+          child.material.emissiveIntensity = 0.5
+          highlightedMeshObj = child
+        }
+      })
+    }
+
     function resetAll() {
       if (!carModel) return
+      highlightedMeshObj = null
       carModel.traverse(child => {
         if (child.isMesh && meshMaterials[child.name]) {
           child.material = meshMaterials[child.name].clone()
@@ -234,6 +255,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       else if (msg.type === 'apply_material') applyMaterial(msg.meshName, msg.colorHex, msg.finish)
       else if (msg.type === 'apply_tint') applyTint(msg.meshName, msg.tintPercent)
       else if (msg.type === 'reset_all') resetAll()
+      else if (msg.type === 'highlight_mesh') highlightMesh(msg.meshName)
     })
 
     window.addEventListener('resize', () => {

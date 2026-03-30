@@ -24,7 +24,7 @@ export default function EditorScreen() {
 
   const {
     selectedMesh, partsConfig, windowsConfig,
-    setCarId, selectMesh, applyMaterial, applyTint, resetAll
+    setCarId, selectMesh, applyMaterial, applyTint, resetAll,
   } = useEditorStore()
 
   const modelUrl = glbUrl || DEMO_GLB
@@ -51,6 +51,7 @@ export default function EditorScreen() {
     } else if (msg.type === 'mesh_tapped') {
       const isGlass = GLASS_MESH_PATTERNS.some(p => msg.meshName.includes(p))
       selectMesh(msg.meshName)
+      viewerRef.current?.send({ type: 'highlight_mesh', meshName: msg.meshName })
       if (isGlass) {
         materialSheetRef.current?.close()
         tintSheetRef.current?.expand()
@@ -64,13 +65,18 @@ export default function EditorScreen() {
   }, [selectMesh])
 
 
+  const deselectMesh = useCallback(() => {
+    selectMesh(null)
+    viewerRef.current?.send({ type: 'highlight_mesh', meshName: null })
+  }, [selectMesh])
+
   const handleMaterialSelect = useCallback((materialId: string, colorHex: string, finish: any) => {
     if (!selectedMesh) return
     applyMaterial(selectedMesh, { materialId, colorHex, finish })
     viewerRef.current?.send({ type: 'apply_material', meshName: selectedMesh, colorHex, finish })
     materialSheetRef.current?.close()
-    selectMesh(null)
-  }, [selectedMesh, applyMaterial, selectMesh])
+    deselectMesh()
+  }, [selectedMesh, applyMaterial, deselectMesh])
 
   const handleTintChange = useCallback((meshName: string, tintPercent: number) => {
     applyTint(meshName, tintPercent)
@@ -80,6 +86,7 @@ export default function EditorScreen() {
   const handleReset = useCallback(() => {
     resetAll()
     viewerRef.current?.send({ type: 'reset_all' })
+    viewerRef.current?.send({ type: 'highlight_mesh', meshName: null })
   }, [resetAll])
 
   const handleSendOrder = useCallback(async () => {
@@ -160,13 +167,13 @@ export default function EditorScreen() {
         ref={materialSheetRef}
         meshName={selectedMesh}
         onSelect={handleMaterialSelect}
-        onClose={() => selectMesh(null)}
+        onClose={deselectMesh}
       />
       <TintSheet
         ref={tintSheetRef}
         windowsConfig={windowsConfig}
         onTintChange={handleTintChange}
-        onClose={() => selectMesh(null)}
+        onClose={deselectMesh}
       />
     </GestureHandlerRootView>
   )
@@ -191,7 +198,7 @@ const styles = StyleSheet.create({
   stats: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   stat: { color: '#666', fontSize: 12 },
   selectedMesh: { color: '#C9A84C', fontSize: 12, fontWeight: '600' },
-  actions: { flexDirection: 'row', gap: 12 },
+  actions: { flexDirection: 'row', gap: 8 },
   btnSecondary: {
     flex: 1, padding: 14, borderRadius: 12, borderWidth: 1,
     borderColor: 'rgba(201,168,76,0.25)', alignItems: 'center',

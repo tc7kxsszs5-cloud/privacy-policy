@@ -6,12 +6,13 @@ export type RNtoWebView =
   | { type: 'apply_material'; meshName: string; colorHex: string; finish: MaterialFinish }
   | { type: 'apply_tint'; meshName: string; tintPercent: number }
   | { type: 'reset_all' }
+  | { type: 'highlight_mesh'; meshName: string | null }
 
 // Messages sent FROM WebView TO React Native
 export type WebViewToRN =
   | { type: 'ready' }
   | { type: 'mesh_tapped'; meshName: string }
-  | { type: 'model_loaded' }
+  | { type: 'model_loaded'; meshNames: string[] }
   | { type: 'model_error'; message: string }
 
 export type MaterialFinish = 'gloss' | 'matte' | 'carbon' | 'chrome' | 'satin'

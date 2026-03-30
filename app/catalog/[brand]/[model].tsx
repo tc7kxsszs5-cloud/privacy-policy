@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { trpc } from '@/constants/trpc'
+import { resolveGlbUri } from '@/constants/car-glb-map'
 
 type Car = { id: string; make: string; model: string; year_from: number;
              year_to: number | null; generation_name: string | null; glb_url?: string | null }
@@ -19,6 +20,15 @@ export default function GenerationsScreen() {
     })
   }, [brand, model])
 
+  const handlePress = async (item: Car) => {
+    const glbUri = await resolveGlbUri(brand, model)
+    const params = new URLSearchParams({
+      glbUrl: glbUri ?? item.glb_url ?? '',
+      carName: `${brand} ${model}`,
+    })
+    router.push(`/editor/${item.id}?${params.toString()}`)
+  }
+
   if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#C9A84C" />
 
   return (
@@ -28,11 +38,7 @@ export default function GenerationsScreen() {
         data={cars}
         keyExtractor={c => c.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}
-            onPress={() => {
-              const params = new URLSearchParams({ glbUrl: item.glb_url ?? '', carName: `${brand} ${model}` })
-              router.push(`/editor/${item.id}?${params.toString()}`)
-            }}>
+          <TouchableOpacity style={styles.card} onPress={() => handlePress(item)}>
             <Text style={styles.gen}>{item.generation_name ?? 'Базовая'}</Text>
             <Text style={styles.years}>
               {item.year_from}–{item.year_to ?? 'н.в.'}

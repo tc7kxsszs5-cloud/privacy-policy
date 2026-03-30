@@ -1,0 +1,23 @@
+// Static require map — Metro needs literal require() calls, no dynamic paths
+export const GLB_ASSETS = {
+  audi_rs5:                require('../assets/models/cars/audi_rs5.glb'),
+  bmw_1m:                  require('../assets/models/cars/bmw_1m.glb'),
+  bmw_m4_csl:              require('../assets/models/cars/bmw_m4_csl.glb'),
+  bmw_m5_f90:              require('../assets/models/cars/bmw_m5_f90.glb'),
+  bmw_x5_m:                require('../assets/models/cars/bmw_x5_m.glb'),
+  bmw_x6_2020:             require('../assets/models/cars/bmw_x6_2020.glb'),
+  bmw_x7:                  require('../assets/models/cars/bmw_x7.glb'),
+  bmw_x7_m60i:             require('../assets/models/cars/bmw_x7_m60i.glb'),
+  cadillac_escalade:        require('../assets/models/cars/cadillac_escalade.glb'),
+  mercedes_amg_gt:          require('../assets/models/cars/mercedes_amg_gt.glb'),
+  mercedes_c_class_2020:    require('../assets/models/cars/mercedes_c_class_2020.glb'),
+  mercedes_eqe:             require('../assets/models/cars/mercedes_eqe.glb'),
+  mercedes_gls:             require('../assets/models/cars/mercedes_gls.glb'),
+  mercedes_maybach_gls600:  require('../assets/models/cars/mercedes_maybach_gls600.glb'),
+  mercedes_sl65_amg:        require('../assets/models/cars/mercedes_sl65_amg.glb'),
+  mercedes_v8_biturbo:      require('../assets/models/cars/mercedes_v8_biturbo.glb'),
+  mercedes_v_class:         require('../assets/models/cars/mercedes_v_class.glb'),
+  porsche_911_carrera_4s:   require('../assets/models/cars/porsche_911_carrera_4s.glb'),
+} as const
+
+export type GlbKey = keyof typeof GLB_ASSETS
