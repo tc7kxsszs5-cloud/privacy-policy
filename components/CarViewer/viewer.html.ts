@@ -95,10 +95,22 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     ground.receiveShadow = true
     scene.add(ground)
 
+    // Mesh name patterns that cannot be colored (lights, interior, glass internals)
+    const PROTECTED_PATTERNS = [
+      'light', 'Light', 'lamp', 'Lamp', 'headlight', 'Headlight',
+      'taillight', 'TailLight', 'turn', 'Turn', 'LED', 'led',
+      'interior', 'Interior', 'seat', 'Seat', 'dashboard', 'Dashboard',
+      'cabin', 'Cabin', 'steering', 'Steering', 'brake', 'Brake',
+    ]
+    function isProtected(name) {
+      return PROTECTED_PATTERNS.some(p => name.includes(p))
+    }
+
     // --- State ---
     let carModel = null
     const meshMaterials = {}
     let highlightedMeshObj = null
+    let highlightedOriginalEmissive = null
 
     // --- Loaders ---
     const dracoLoader = new DRACOLoader()
@@ -108,6 +120,9 @@ export const VIEWER_HTML = `<!DOCTYPE html>
 
     function loadModel(url) {
       if (carModel) { scene.remove(carModel); carModel = null }
+      Object.keys(meshMaterials).forEach(k => delete meshMaterials[k])
+      highlightedMeshObj = null
+      highlightedOriginalEmissive = null
       document.getElementById('loading').style.display = 'block'
 
       gltfLoader.load(url,
@@ -154,7 +169,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     }
 
     function applyMaterial(meshName, colorHex, finish) {
-      if (!carModel) return
+      if (!carModel || isProtected(meshName)) return
       const color = new THREE.Color(colorHex)
       carModel.traverse(child => {
         if (child.isMesh && child.name === meshName) {
@@ -163,9 +178,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
             roughness: FINISH_ROUGHNESS[finish] ?? 0.5,
             metalness: FINISH_METALNESS[finish] ?? 0.1,
           })
-          if (finish === 'chrome') {
-            mat.envMapIntensity = 2.0
-          }
+          if (finish === 'chrome') mat.envMapIntensity = 2.0
           child.material = mat
         }
       })
@@ -188,15 +201,20 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     }
 
     function highlightMesh(meshName) {
-      // Remove previous highlight
-      if (highlightedMeshObj && highlightedMeshObj.material) {
-        highlightedMeshObj.material.emissive = new THREE.Color(0x000000)
-        highlightedMeshObj.material.emissiveIntensity = 0
+      // Restore previous mesh material before highlighting new one
+      if (highlightedMeshObj) {
+        if (highlightedOriginalEmissive !== null && highlightedMeshObj.material) {
+          highlightedMeshObj.material.emissive.copy(highlightedOriginalEmissive)
+          highlightedMeshObj.material.emissiveIntensity = 0
+        }
         highlightedMeshObj = null
+        highlightedOriginalEmissive = null
       }
       if (!meshName || !carModel) return
       carModel.traverse(child => {
         if (child.isMesh && child.name === meshName && child.material) {
+          if (!child.material.emissive) return
+          highlightedOriginalEmissive = child.material.emissive.clone()
           child.material.emissive = new THREE.Color(0xC9A84C)
           child.material.emissiveIntensity = 0.5
           highlightedMeshObj = child
@@ -237,8 +255,10 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       const meshes = []
       carModel.traverse(c => { if (c.isMesh) meshes.push(c) })
       const hits = raycaster.intersectObjects(meshes, false)
-      if (hits.length > 0) {
-        sendToRN({ type: 'mesh_tapped', meshName: hits[0].object.name })
+      // Skip protected meshes (lights, interior) — find first colorable hit
+      const hit = hits.find(h => h.object.name && !isProtected(h.object.name))
+      if (hit) {
+        sendToRN({ type: 'mesh_tapped', meshName: hit.object.name })
       }
     })
 
