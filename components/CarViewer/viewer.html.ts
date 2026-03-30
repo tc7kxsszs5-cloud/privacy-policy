@@ -4,11 +4,12 @@ export const VIEWER_HTML = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #dce0e8; overflow: hidden; width: 100vw; height: 100vh; }
+    body { background: #1a1a1a; overflow: hidden; width: 100vw; height: 100vh; touch-action: none; }
     canvas { display: block; width: 100% !important; height: 100% !important; }
     #loading {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      color: #e63946; font-family: sans-serif; font-size: 14px;
+      color: #C9A84C; font-family: -apple-system, sans-serif; font-size: 15px;
+      letter-spacing: 0.05em;
     }
   </style>
 </head>
@@ -28,240 +29,317 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
     import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 
-    // --- Scene setup ---
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
-    renderer.setPixelRatio(window.devicePixelRatio)
+    // ─── Renderer ────────────────────────────────────────────────────────────
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.2
+    renderer.toneMappingExposure = 1.3
+    renderer.outputColorSpace = THREE.SRGBColorSpace
     document.body.appendChild(renderer.domElement)
 
+    // ─── Scene ───────────────────────────────────────────────────────────────
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0xdce0e8)
+    scene.background = new THREE.Color(0x1a1a1a)
 
-    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100)
-    camera.position.set(3.5, 1.8, 3.5)
+    // ─── Camera ──────────────────────────────────────────────────────────────
+    const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.05, 100)
+    camera.position.set(4, 1.8, 4)
 
+    // ─── Controls — smooth, no drift ─────────────────────────────────────────
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
-    controls.dampingFactor = 0.05
-    controls.minDistance = 0.5
-    controls.maxDistance = 10
-    controls.maxPolarAngle = Math.PI / 2 + 0.2
+    controls.dampingFactor = 0.06        // smooth deceleration
+    controls.rotateSpeed = 0.65          // comfortable touch speed
+    controls.zoomSpeed = 0.9
+    controls.minDistance = 1.5
+    controls.maxDistance = 12
+    controls.maxPolarAngle = Math.PI / 2 + 0.15   // can't go below ground
+    controls.minPolarAngle = 0.05                  // can't go fully top-down
     controls.enablePan = false
-    controls.touches = {
-      ONE: THREE.TOUCH.ROTATE,
-      TWO: THREE.TOUCH.DOLLY_ROTATE
-    }
+    controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE }
 
-    // Studio lighting — bright and even like a real detailing studio
-    // Key light: large soft box top-left
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.5)
-    keyLight.position.set(-3, 6, 3)
-    keyLight.castShadow = true
-    scene.add(keyLight)
-
-    // Fill light: right side, slightly cool
-    const fillLight = new THREE.DirectionalLight(0xeef4ff, 2.0)
-    fillLight.position.set(4, 5, 2)
-    scene.add(fillLight)
-
-    // Rim light: behind car, separates from background
-    const rimLight = new THREE.DirectionalLight(0xffffff, 1.5)
-    rimLight.position.set(0, 4, -5)
-    scene.add(rimLight)
-
-    // Top overhead: ceiling panel
-    const topLight = new THREE.DirectionalLight(0xffffff, 1.2)
-    topLight.position.set(0, 8, 0)
-    scene.add(topLight)
-
-    // Front fill: subtle from camera direction
-    const frontLight = new THREE.DirectionalLight(0xffffff, 0.8)
-    frontLight.position.set(0, 2, 8)
-    scene.add(frontLight)
-
-    // Ambient: high so shadows aren't black
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5)
+    // ─── Studio Lighting ─────────────────────────────────────────────────────
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.8)
     scene.add(ambientLight)
 
-    // Ground — light studio floor
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.8)
+    keyLight.position.set(-4, 8, 4)
+    keyLight.castShadow = true
+    keyLight.shadow.mapSize.set(2048, 2048)
+    keyLight.shadow.camera.near = 0.1
+    keyLight.shadow.camera.far = 30
+    keyLight.shadow.camera.left = -6
+    keyLight.shadow.camera.right = 6
+    keyLight.shadow.camera.top = 6
+    keyLight.shadow.camera.bottom = -6
+    keyLight.shadow.bias = -0.001
+    scene.add(keyLight)
+
+    const fillLight = new THREE.DirectionalLight(0xddeeff, 1.6)
+    fillLight.position.set(5, 4, 2)
+    scene.add(fillLight)
+
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.4)
+    rimLight.position.set(0, 3, -6)
+    scene.add(rimLight)
+
+    const topLight = new THREE.DirectionalLight(0xffffff, 1.0)
+    topLight.position.set(0, 10, 0)
+    scene.add(topLight)
+
+    // Ground — subtle reflection plane
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(20, 20),
-      new THREE.MeshStandardMaterial({ color: 0xc8ccd4, roughness: 0.6 })
+      new THREE.PlaneGeometry(30, 30),
+      new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8, metalness: 0.1 })
     )
     ground.rotation.x = -Math.PI / 2
+    ground.position.y = -0.001
     ground.receiveShadow = true
     scene.add(ground)
 
-    // Mesh name patterns that cannot be colored (lights, interior, glass internals)
-    const PROTECTED_PATTERNS = [
+    // ─── Protected meshes — cannot be colored ────────────────────────────────
+    const PROTECTED = [
       'light', 'Light', 'lamp', 'Lamp', 'headlight', 'Headlight',
-      'taillight', 'TailLight', 'turn', 'Turn', 'LED', 'led',
+      'taillight', 'TailLight', 'tail_light', 'DRL', 'drl',
+      'turn', 'Turn', 'LED', 'led', 'lens', 'Lens',
       'interior', 'Interior', 'seat', 'Seat', 'dashboard', 'Dashboard',
       'cabin', 'Cabin', 'steering', 'Steering', 'brake', 'Brake',
+      'carpet', 'Carpet', 'trim_int', 'console', 'Console',
     ]
     function isProtected(name) {
-      return PROTECTED_PATTERNS.some(p => name.includes(p))
+      if (!name) return true
+      return PROTECTED.some(p => name.toLowerCase().includes(p.toLowerCase()))
     }
 
-    // --- State ---
-    let carModel = null
-    const meshMaterials = {}
-    let highlightedMeshObj = null
-    let highlightedOriginalEmissive = null
+    // Glass patterns → tint only
+    const GLASS = ['glass', 'window', 'windshield', 'windscreen', 'backlite']
+    function isGlass(name) {
+      if (!name) return false
+      const n = name.toLowerCase()
+      return GLASS.some(p => n.includes(p))
+    }
 
-    // --- Loaders ---
+    // ─── State ───────────────────────────────────────────────────────────────
+    let carModel = null
+    const meshMaterials = {}        // original materials keyed by mesh uuid
+    const meshByName = {}           // mesh objects keyed by name
+    let highlightedMesh = null
+    let highlightSavedEmissive = null
+    let highlightSavedIntensity = 0
+
+    // ─── Loaders ─────────────────────────────────────────────────────────────
     const dracoLoader = new DRACOLoader()
     dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/libs/draco/')
     const gltfLoader = new GLTFLoader()
     gltfLoader.setDRACOLoader(dracoLoader)
 
+    // ─── Load model ──────────────────────────────────────────────────────────
     function loadModel(url) {
       if (carModel) { scene.remove(carModel); carModel = null }
+      // Clear state
       Object.keys(meshMaterials).forEach(k => delete meshMaterials[k])
-      highlightedMeshObj = null
-      highlightedOriginalEmissive = null
+      Object.keys(meshByName).forEach(k => delete meshByName[k])
+      highlightedMesh = null
+      highlightSavedEmissive = null
       document.getElementById('loading').style.display = 'block'
 
-      gltfLoader.load(url,
-        (gltf) => {
-          carModel = gltf.scene
-          const box = new THREE.Box3().setFromObject(carModel)
-          const center = box.getCenter(new THREE.Vector3())
-          const size = box.getSize(new THREE.Vector3())
-          const maxDim = Math.max(size.x, size.y, size.z)
-          const scale = 4 / maxDim
-          carModel.scale.setScalar(scale)
-          carModel.position.sub(center.multiplyScalar(scale))
-          carModel.position.y = 0
+      gltfLoader.load(url, (gltf) => {
+        carModel = gltf.scene
 
-          const meshNames = []
-          carModel.traverse(child => {
-            if (child.isMesh) {
-              child.castShadow = true
-              child.receiveShadow = true
-              if (!meshMaterials[child.name]) {
-                meshMaterials[child.name] = child.material.clone()
-              }
-              if (child.name) meshNames.push(child.name)
-            }
-          })
+        // Center and scale to fit scene
+        const box = new THREE.Box3().setFromObject(carModel)
+        const center = box.getCenter(new THREE.Vector3())
+        const size = box.getSize(new THREE.Vector3())
+        const maxDim = Math.max(size.x, size.y, size.z)
+        const scale = 4.5 / maxDim
+        carModel.scale.setScalar(scale)
+        center.multiplyScalar(scale)
+        carModel.position.set(-center.x, -box.min.y * scale, -center.z)
 
-          scene.add(carModel)
-          document.getElementById('loading').style.display = 'none'
-          sendToRN({ type: 'model_loaded', meshNames })
-        },
-        undefined,
-        (err) => {
-          document.getElementById('loading').textContent = 'Ошибка загрузки'
-          sendToRN({ type: 'model_error', message: err.message || 'load failed' })
-        }
-      )
+        // Reset camera to good angle
+        const dist = Math.max(size.x, size.z) * scale * 1.4
+        camera.position.set(dist, dist * 0.4, dist)
+        controls.target.set(0, size.y * scale * 0.35, 0)
+        controls.update()
+
+        const meshNames = []
+        carModel.traverse(child => {
+          if (!child.isMesh) return
+          child.castShadow = true
+          child.receiveShadow = true
+
+          // Save original material (handle array materials)
+          const key = child.uuid
+          if (Array.isArray(child.material)) {
+            meshMaterials[key] = child.material.map(m => m.clone())
+          } else if (child.material) {
+            meshMaterials[key] = child.material.clone()
+          }
+
+          // Register by name
+          if (child.name) {
+            meshByName[child.name] = child
+            if (!isProtected(child.name)) meshNames.push(child.name)
+          }
+        })
+
+        scene.add(carModel)
+        document.getElementById('loading').style.display = 'none'
+        sendToRN({ type: 'model_loaded', meshNames })
+      },
+      undefined,
+      (err) => {
+        document.getElementById('loading').textContent = 'Ошибка загрузки'
+        sendToRN({ type: 'model_error', message: err.message || 'load failed' })
+      })
     }
 
-    const FINISH_ROUGHNESS = {
-      gloss: 0.05, matte: 0.9, carbon: 0.3, chrome: 0.0, satin: 0.4
-    }
-    const FINISH_METALNESS = {
-      gloss: 0.1, matte: 0.0, carbon: 0.3, chrome: 1.0, satin: 0.15
-    }
+    // ─── Material presets ────────────────────────────────────────────────────
+    const ROUGHNESS = { gloss: 0.05, matte: 0.85, carbon: 0.35, chrome: 0.0, satin: 0.45 }
+    const METALNESS = { gloss: 0.15, matte: 0.0,  carbon: 0.4,  chrome: 1.0, satin: 0.2  }
 
     function applyMaterial(meshName, colorHex, finish) {
-      if (!carModel || isProtected(meshName)) return
-      const color = new THREE.Color(colorHex)
-      carModel.traverse(child => {
-        if (child.isMesh && child.name === meshName) {
-          const mat = new THREE.MeshStandardMaterial({
-            color,
-            roughness: FINISH_ROUGHNESS[finish] ?? 0.5,
-            metalness: FINISH_METALNESS[finish] ?? 0.1,
-          })
-          if (finish === 'chrome') mat.envMapIntensity = 2.0
-          child.material = mat
-        }
+      if (!carModel || !meshName || isProtected(meshName)) return
+      const mesh = meshByName[meshName]
+      if (!mesh) return
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(colorHex),
+        roughness: ROUGHNESS[finish] ?? 0.5,
+        metalness: METALNESS[finish] ?? 0.1,
+        envMapIntensity: finish === 'chrome' ? 2.5 : 1.0,
       })
+
+      // If this mesh is highlighted, carry over emissive
+      if (highlightedMesh === mesh) {
+        mat.emissive = new THREE.Color(0xC9A84C)
+        mat.emissiveIntensity = 0.5
+        highlightSavedEmissive = new THREE.Color(0x000000)
+      }
+      mesh.material = mat
     }
 
     function applyTint(meshName, tintPercent) {
-      if (!carModel) return
-      carModel.traverse(child => {
-        if (child.isMesh && child.name === meshName) {
-          const opacity = 1 - (tintPercent / 100) * 0.95
-          child.material = new THREE.MeshStandardMaterial({
-            color: 0x111111,
-            transparent: true,
-            opacity,
-            roughness: 0.0,
-            metalness: 0.0,
-          })
-        }
+      if (!carModel || !meshName) return
+      const mesh = meshByName[meshName]
+      if (!mesh) return
+      const opacity = 1 - (tintPercent / 100) * 0.9
+      mesh.material = new THREE.MeshPhysicalMaterial({
+        color: 0x0a0a0a,
+        transparent: true,
+        opacity,
+        roughness: 0.0,
+        metalness: 0.0,
+        transmission: 0.1,
       })
     }
 
+    // ─── Highlight ───────────────────────────────────────────────────────────
     function highlightMesh(meshName) {
-      // Restore previous mesh material before highlighting new one
-      if (highlightedMeshObj) {
-        if (highlightedOriginalEmissive !== null && highlightedMeshObj.material) {
-          highlightedMeshObj.material.emissive.copy(highlightedOriginalEmissive)
-          highlightedMeshObj.material.emissiveIntensity = 0
+      // Restore previous highlight
+      if (highlightedMesh && highlightedMesh.material && !Array.isArray(highlightedMesh.material)) {
+        if (highlightSavedEmissive) {
+          highlightedMesh.material.emissive.copy(highlightSavedEmissive)
         }
-        highlightedMeshObj = null
-        highlightedOriginalEmissive = null
+        highlightedMesh.material.emissiveIntensity = highlightSavedIntensity
       }
+      highlightedMesh = null
+      highlightSavedEmissive = null
+
       if (!meshName || !carModel) return
-      carModel.traverse(child => {
-        if (child.isMesh && child.name === meshName && child.material) {
-          if (!child.material.emissive) return
-          highlightedOriginalEmissive = child.material.emissive.clone()
-          child.material.emissive = new THREE.Color(0xC9A84C)
-          child.material.emissiveIntensity = 0.5
-          highlightedMeshObj = child
-        }
-      })
+      const mesh = meshByName[meshName]
+      if (!mesh || !mesh.material || Array.isArray(mesh.material)) return
+
+      if (mesh.material.emissive !== undefined) {
+        highlightSavedEmissive = mesh.material.emissive.clone()
+        highlightSavedIntensity = mesh.material.emissiveIntensity || 0
+        mesh.material.emissive = new THREE.Color(0xC9A84C)
+        mesh.material.emissiveIntensity = 0.6
+        highlightedMesh = mesh
+      }
     }
 
+    // ─── Reset all ───────────────────────────────────────────────────────────
     function resetAll() {
       if (!carModel) return
-      highlightedMeshObj = null
+      highlightedMesh = null
+      highlightSavedEmissive = null
       carModel.traverse(child => {
-        if (child.isMesh && meshMaterials[child.name]) {
-          child.material = meshMaterials[child.name].clone()
-        }
+        if (!child.isMesh) return
+        const orig = meshMaterials[child.uuid]
+        if (!orig) return
+        child.material = Array.isArray(orig) ? orig.map(m => m.clone()) : orig.clone()
       })
     }
 
+    // ─── Raycasting — multi-sample for thin parts ────────────────────────────
     const raycaster = new THREE.Raycaster()
-    const pointer = new THREE.Vector2()
+    raycaster.params.Mesh = {}   // default precision for mesh
+
+    // Sample offsets in NDC to catch thin parts (moldings, spoilers, window trims)
+    const SAMPLE_OFFSETS = [
+      [0, 0], [0.012, 0], [-0.012, 0], [0, 0.012], [0, -0.012],
+      [0.009, 0.009], [-0.009, 0.009], [0.009, -0.009], [-0.009, -0.009]
+    ]
+
+    function getBestHit(ndcX, ndcY) {
+      if (!carModel) return null
+      const meshes = []
+      carModel.traverse(c => { if (c.isMesh && c.name) meshes.push(c) })
+
+      const seen = new Set()
+      const candidates = []
+
+      for (const [ox, oy] of SAMPLE_OFFSETS) {
+        raycaster.setFromCamera(
+          new THREE.Vector2(ndcX + ox, ndcY + oy),
+          camera
+        )
+        const hits = raycaster.intersectObjects(meshes, false)
+        for (const hit of hits) {
+          const name = hit.object.name
+          if (!name || seen.has(name) || isProtected(name)) continue
+          seen.add(name)
+          candidates.push({ name, dist: hit.distance })
+          break  // only take closest per sample
+        }
+      }
+
+      if (candidates.length === 0) return null
+      // Return the closest candidate across all samples
+      candidates.sort((a, b) => a.dist - b.dist)
+      return candidates[0].name
+    }
+
+    // ─── Tap detection ───────────────────────────────────────────────────────
     let tapStart = null
+    const TAP_MOVE_THRESHOLD = 15   // px — slightly generous for mobile
+    const TAP_TIME_THRESHOLD = 280  // ms
 
     renderer.domElement.addEventListener('pointerdown', e => {
       tapStart = { x: e.clientX, y: e.clientY, time: Date.now() }
     })
+
     renderer.domElement.addEventListener('pointerup', e => {
       if (!tapStart) return
       const dx = Math.abs(e.clientX - tapStart.x)
       const dy = Math.abs(e.clientY - tapStart.y)
       const dt = Date.now() - tapStart.time
       tapStart = null
-      if (dx > 10 || dy > 10 || dt > 300) return
+      if (dx > TAP_MOVE_THRESHOLD || dy > TAP_MOVE_THRESHOLD || dt > TAP_TIME_THRESHOLD) return
 
-      pointer.x = (e.clientX / window.innerWidth) * 2 - 1
-      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1
-      raycaster.setFromCamera(pointer, camera)
-
-      if (!carModel) return
-      const meshes = []
-      carModel.traverse(c => { if (c.isMesh) meshes.push(c) })
-      const hits = raycaster.intersectObjects(meshes, false)
-      // Skip protected meshes (lights, interior) — find first colorable hit
-      const hit = hits.find(h => h.object.name && !isProtected(h.object.name))
-      if (hit) {
-        sendToRN({ type: 'mesh_tapped', meshName: hit.object.name })
+      const ndcX = (e.clientX / window.innerWidth) * 2 - 1
+      const ndcY = -(e.clientY / window.innerHeight) * 2 + 1
+      const meshName = getBestHit(ndcX, ndcY)
+      if (meshName) {
+        sendToRN({ type: 'mesh_tapped', meshName })
       }
     })
 
+    // ─── Message bridge ───────────────────────────────────────────────────────
     function sendToRN(msg) {
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage(JSON.stringify(msg))
@@ -271,19 +349,21 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     window.addEventListener('message', e => {
       let msg
       try { msg = JSON.parse(e.data) } catch { return }
-      if (msg.type === 'load_model') loadModel(msg.glbUrl)
+      if      (msg.type === 'load_model')     loadModel(msg.glbUrl)
       else if (msg.type === 'apply_material') applyMaterial(msg.meshName, msg.colorHex, msg.finish)
-      else if (msg.type === 'apply_tint') applyTint(msg.meshName, msg.tintPercent)
-      else if (msg.type === 'reset_all') resetAll()
+      else if (msg.type === 'apply_tint')     applyTint(msg.meshName, msg.tintPercent)
+      else if (msg.type === 'reset_all')      resetAll()
       else if (msg.type === 'highlight_mesh') highlightMesh(msg.meshName)
     })
 
+    // ─── Resize ───────────────────────────────────────────────────────────────
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight
       camera.updateProjectionMatrix()
       renderer.setSize(window.innerWidth, window.innerHeight)
     })
 
+    // ─── Render loop ──────────────────────────────────────────────────────────
     function animate() {
       requestAnimationFrame(animate)
       controls.update()
@@ -294,4 +374,5 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     sendToRN({ type: 'ready' })
   </script>
 </body>
-</html>\``
+</html>\`
+`
