@@ -1,11 +1,41 @@
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Animated } from 'react-native'
+import { useRef, useEffect } from 'react'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth } from '@/constants/AuthContext'
 
+const HERO_COLORS = [
+  '#C9A84C', // золото (бренд)
+  '#ff3020', // красный
+  '#fc6c00', // оранжевый
+  '#fec500', // жёлтый
+  '#4fc96b', // зелёный
+  '#2196F3', // синий
+  '#9C27B0', // фиолетовый
+  '#e6e9ee', // белый
+]
+
 export default function HomeScreen() {
   const router = useRouter()
   const { user, profile } = useAuth()
+
+  const colorAnim = useRef(new Animated.Value(0)).current
+
+  useEffect(() => {
+    const animate = (index: number) => {
+      Animated.timing(colorAnim, {
+        toValue: index,
+        duration: 2000,
+        useNativeDriver: false,
+      }).start(() => animate((index + 1) % HERO_COLORS.length))
+    }
+    animate(1)
+  }, [])
+
+  const animatedColor = colorAnim.interpolate({
+    inputRange: HERO_COLORS.map((_, i) => i),
+    outputRange: HERO_COLORS,
+  })
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
@@ -45,7 +75,7 @@ export default function HomeScreen() {
           <View style={styles.heroOverlay} />
           <View style={styles.heroContent}>
             <Text style={styles.heroTag}>Студия оклейки авто · Москва</Text>
-            <Text style={styles.heroTitle}>Создай{'\n'}свой{'\n'}стиль</Text>
+            <Animated.Text style={[styles.heroTitle, { color: animatedColor }]}>Создай{'\n'}свой{'\n'}стиль</Animated.Text>
             <Text style={styles.heroDesc}>
               Выбери автомобиль, настрой цвет в 3D{'\n'}и отправь заявку. Оплата — в студии.
             </Text>
