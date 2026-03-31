@@ -92,7 +92,7 @@ export default function HomeScreen() {
           {/* 3D Конфигуратор */}
           <TouchableOpacity
             style={[styles.halfCard, { marginRight: 6 }]}
-            onPress={() => router.push('/catalog')}
+            onPress={() => router.push('/studio/gallery' as any)}
             activeOpacity={0.85}
           >
             <Image
@@ -102,8 +102,8 @@ export default function HomeScreen() {
             />
             <View style={styles.cardOverlay} />
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>3D Конфигуратор</Text>
-              <Text style={styles.cardDesc}>Крути модель, выбирай цвет</Text>
+              <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>Наши работы</Text>
+              <Text style={styles.cardDesc}>Фото работ студии</Text>
             </View>
           </TouchableOpacity>
 
