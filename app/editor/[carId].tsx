@@ -47,8 +47,6 @@ export default function EditorScreen() {
     }
   }, [carId])
 
-  const GLASS_MESH_PATTERNS = ['glass_', 'Window', 'Windshield', 'windshield', 'window', 'Glass']
-
   const handleViewerMessage = useCallback((msg: WebViewToRN) => {
     if (msg.type === 'ready') {
       viewerReadyRef.current = true
@@ -66,10 +64,9 @@ export default function EditorScreen() {
         if (tintPercent > 0) viewerRef.current?.send({ type: 'apply_tint', meshName, tintPercent })
       })
     } else if (msg.type === 'mesh_tapped') {
-      const isGlass = GLASS_MESH_PATTERNS.some(p => msg.meshName.includes(p))
       selectMesh(msg.meshName)
       viewerRef.current?.send({ type: 'highlight_mesh', meshName: msg.meshName })
-      if (isGlass) {
+      if (msg.isGlass) {
         materialSheetRef.current?.close()
         tintSheetRef.current?.expand()
       } else {

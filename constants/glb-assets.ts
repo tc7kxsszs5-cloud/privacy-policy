@@ -18,6 +18,15 @@ export const GLB_ASSETS = {
   mercedes_v8_biturbo:      require('../assets/models/cars/mercedes_v8_biturbo.glb'),
   mercedes_v_class:         require('../assets/models/cars/mercedes_v_class.glb'),
   porsche_911_carrera_4s:   require('../assets/models/cars/porsche_911_carrera_4s.glb'),
+  ferrari_purosangue_2023:  require('../assets/models/cars/ferrari_purosangue_2023.glb'),
+  ferrari_laferrari:        require('../assets/models/cars/ferrari_laferrari.glb'),
+  ferrari_p45_pininfarina:  require('../assets/models/cars/ferrari_p45_pininfarina.glb'),
+  ferrari_599_gto:          require('../assets/models/cars/ferrari_599_gto.glb'),
+  porsche_cayenne_turbo_coupe_2020: require('../assets/models/cars/porsche_cayenne_turbo_coupe_2020.glb'),
+  rolls_royce_cullinan_2026:        require('../assets/models/cars/rolls_royce_cullinan_2026.glb'),
+  rolls_royce_ghost:                require('../assets/models/cars/rolls_royce_ghost.glb'),
+  rolls_royce_boattail:             require('../assets/models/cars/rolls_royce_boattail.glb'),
+  porsche_cayenne_turbo_gt_2022:    require('../assets/models/cars/porsche_cayenne_turbo_gt_2022.glb'),
 } as const
 
 export type GlbKey = keyof typeof GLB_ASSETS

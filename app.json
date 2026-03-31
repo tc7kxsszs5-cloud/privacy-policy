@@ -25,6 +25,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.kiku79.detailingtime",
+      "buildNumber": "17",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }

@@ -1,6 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useAuth } from '@/constants/AuthContext'
 
+const APP_VERSION = '1.0.0'
+const APP_BUILD = '17'
+
 export default function ProfileScreen() {
   const { profile, signOut } = useAuth()
 
@@ -13,6 +16,11 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.button} onPress={signOut}>
         <Text style={styles.buttonText}>Выйти</Text>
       </TouchableOpacity>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerVersion}>Версия {APP_VERSION} ({APP_BUILD})</Text>
+        <Text style={styles.footerDev}>Mikheil Galoian by Detailing Time</Text>
+      </View>
     </View>
   )
 }
@@ -25,4 +33,7 @@ const styles = StyleSheet.create({
   button: { backgroundColor: '#141414', borderRadius: 12, paddingVertical: 14,
             paddingHorizontal: 40, borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)' },
   buttonText: { color: '#C9A84C', fontSize: 16 },
+  footer: { position: 'absolute', bottom: 40, alignItems: 'center', gap: 4 },
+  footerVersion: { color: '#333', fontSize: 12 },
+  footerDev: { color: '#333', fontSize: 12 },
 })

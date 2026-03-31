@@ -11,7 +11,7 @@ export type RNtoWebView =
 // Messages sent FROM WebView TO React Native
 export type WebViewToRN =
   | { type: 'ready' }
-  | { type: 'mesh_tapped'; meshName: string }
+  | { type: 'mesh_tapped'; meshName: string; isGlass: boolean }
   | { type: 'model_loaded'; meshNames: string[] }
   | { type: 'model_error'; message: string }
 

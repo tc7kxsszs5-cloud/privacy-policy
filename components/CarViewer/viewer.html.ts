@@ -202,7 +202,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     const METALNESS = { gloss: 0.15, matte: 0.0,  carbon: 0.4,  chrome: 1.0, satin: 0.2  }
 
     function applyMaterial(meshName, colorHex, finish) {
-      if (!carModel || !meshName || isProtected(meshName)) return
+      if (!carModel || !meshName || isProtected(meshName) || isGlass(meshName)) return
       const mesh = meshByName[meshName]
       if (!mesh) return
 
@@ -257,7 +257,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
         highlightSavedEmissive = mesh.material.emissive.clone()
         highlightSavedIntensity = mesh.material.emissiveIntensity || 0
         mesh.material.emissive = new THREE.Color(0xC9A84C)
-        mesh.material.emissiveIntensity = 0.6
+        mesh.material.emissiveIntensity = 0.22
         highlightedMesh = mesh
       }
     }
@@ -335,7 +335,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       const ndcY = -(e.clientY / window.innerHeight) * 2 + 1
       const meshName = getBestHit(ndcX, ndcY)
       if (meshName) {
-        sendToRN({ type: 'mesh_tapped', meshName })
+        sendToRN({ type: 'mesh_tapped', meshName, isGlass: isGlass(meshName) })
       }
     })
 

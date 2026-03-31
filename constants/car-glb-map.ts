@@ -22,6 +22,15 @@ const MAPPING: Array<{ key: GlbKey; make: string; models: string[] }> = [
   { key: 'mercedes_v8_biturbo',     make: 'Mercedes-Benz',  models: ['CLS', 'CLS AMG'] },
   { key: 'mercedes_v_class',        make: 'Mercedes-Benz',  models: ['V-Класс', 'Vito'] },
   { key: 'porsche_911_carrera_4s',  make: 'Porsche',        models: ['911', '911 GT2', '911 GT3', '911 R', '911 S/T'] },
+  { key: 'ferrari_purosangue_2023', make: 'Ferrari',        models: ['Purosangue'] },
+  { key: 'ferrari_laferrari',       make: 'Ferrari',        models: ['LaFerrari'] },
+  { key: 'ferrari_599_gto',         make: 'Ferrari',        models: ['599 GTB Fiorano', '599 GTO'] },
+  { key: 'ferrari_p45_pininfarina',          make: 'Ferrari',  models: ['P45 Pininfarina'] },
+  { key: 'porsche_cayenne_turbo_coupe_2020', make: 'Porsche',       models: ['Cayenne Turbo Coupe', 'Cayenne Coupe', 'Cayenne Turbo'] },
+  { key: 'rolls_royce_cullinan_2026',        make: 'Rolls-Royce',   models: ['Cullinan', 'Cullinan Black Badge'] },
+  { key: 'rolls_royce_ghost',                make: 'Rolls-Royce',   models: ['Ghost', 'Ghost Series II'] },
+  { key: 'rolls_royce_boattail',             make: 'Rolls-Royce',   models: ['Boat Tail'] },
+  { key: 'porsche_cayenne_turbo_gt_2022',    make: 'Porsche',       models: ['Cayenne Turbo GT'] },
 ]
 
 export function getGlbKey(make: string, model: string): GlbKey | null {
