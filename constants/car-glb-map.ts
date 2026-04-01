@@ -14,7 +14,7 @@ const MAPPING: Array<{ key: GlbKey; make: string; models: string[] }> = [
   { key: 'bmw_x7',                 make: 'BMW',            models: ['XM'] },
   { key: 'cadillac_escalade',       make: 'Cadillac',       models: ['Escalade', 'Escalade ESV'] },
   { key: 'mercedes_amg_gt',         make: 'Mercedes-Benz',  models: ['AMG GT'] },
-  { key: 'mercedes_c_class_2020',   make: 'Mercedes-Benz',  models: ['C-Class'] },
+  { key: 'mercedes_c_class_2020',   make: 'Mercedes-Benz',  models: ['C-Class', 'C-Класс AMG'] },
   { key: 'mercedes_eqe',            make: 'Mercedes-Benz',  models: ['EQE', 'EQE AMG', 'EQE SUV', 'EQE SUV AMG'] },
   { key: 'mercedes_gls',            make: 'Mercedes-Benz',  models: ['GLS', 'GLS AMG'] },
   { key: 'mercedes_maybach_gls600', make: 'Mercedes-Benz',  models: ['Maybach GLS'] },
@@ -31,6 +31,7 @@ const MAPPING: Array<{ key: GlbKey; make: string; models: string[] }> = [
   { key: 'rolls_royce_ghost',                make: 'Rolls-Royce',   models: ['Ghost', 'Ghost Series II'] },
   { key: 'rolls_royce_boattail',             make: 'Rolls-Royce',   models: ['Boat Tail'] },
   { key: 'porsche_cayenne_turbo_gt_2022',    make: 'Porsche',       models: ['Cayenne Turbo GT'] },
+  { key: 'mercedes_g_class',                make: 'Mercedes-Benz', models: ['G-Класс', 'G-Класс AMG', 'G-Класс AMG 6x6', 'Maybach G 650 Landaulet'] },
 ]
 
 export function getGlbKey(make: string, model: string): GlbKey | null {

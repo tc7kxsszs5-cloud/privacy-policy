@@ -126,6 +126,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     let carModel = null
     const meshMaterials = {}        // original materials keyed by mesh uuid
     const meshByName = {}           // mesh objects keyed by name
+    let meshesArray = []            // flat array for raycasting — rebuilt on load
     let highlightedMesh = null
     let highlightSavedEmissive = null
     let highlightSavedIntensity = 0
@@ -142,6 +143,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       // Clear state
       Object.keys(meshMaterials).forEach(k => delete meshMaterials[k])
       Object.keys(meshByName).forEach(k => delete meshByName[k])
+      meshesArray = []
       highlightedMesh = null
       highlightSavedEmissive = null
       document.getElementById('loading').style.display = 'block'
@@ -182,6 +184,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
           // Register by name
           if (child.name) {
             meshByName[child.name] = child
+            meshesArray.push(child)
             if (!isProtected(child.name)) meshNames.push(child.name)
           }
         })
@@ -277,18 +280,19 @@ export const VIEWER_HTML = `<!DOCTYPE html>
 
     // ─── Raycasting — multi-sample for thin parts ────────────────────────────
     const raycaster = new THREE.Raycaster()
-    raycaster.params.Mesh = {}   // default precision for mesh
 
-    // Sample offsets in NDC to catch thin parts (moldings, spoilers, window trims)
-    const SAMPLE_OFFSETS = [
-      [0, 0], [0.012, 0], [-0.012, 0], [0, 0.012], [0, -0.012],
-      [0.009, 0.009], [-0.009, 0.009], [0.009, -0.009], [-0.009, -0.009]
-    ]
+    // 5×5 grid at 0.01 NDC spacing — covers ~4px per step on 390px screen
+    // Catches thin moldings, grille bars, spoiler lips, window trims
+    const SAMPLE_OFFSETS = (() => {
+      const offsets = []
+      for (let i = -2; i <= 2; i++)
+        for (let j = -2; j <= 2; j++)
+          offsets.push([i * 0.01, j * 0.01])
+      return offsets  // 25 samples
+    })()
 
     function getBestHit(ndcX, ndcY) {
-      if (!carModel) return null
-      const meshes = []
-      carModel.traverse(c => { if (c.isMesh && c.name) meshes.push(c) })
+      if (!carModel || meshesArray.length === 0) return null
 
       const seen = new Set()
       const candidates = []
@@ -298,18 +302,18 @@ export const VIEWER_HTML = `<!DOCTYPE html>
           new THREE.Vector2(ndcX + ox, ndcY + oy),
           camera
         )
-        const hits = raycaster.intersectObjects(meshes, false)
+        const hits = raycaster.intersectObjects(meshesArray, false)
         for (const hit of hits) {
           const name = hit.object.name
           if (!name || seen.has(name) || isProtected(name)) continue
           seen.add(name)
           candidates.push({ name, dist: hit.distance })
-          break  // only take closest per sample
+          break  // closest per sample
         }
       }
 
       if (candidates.length === 0) return null
-      // Return the closest candidate across all samples
+      // Closest overall wins — detail parts (grille, moldings) are in front of body panels
       candidates.sort((a, b) => a.dist - b.dist)
       return candidates[0].name
     }

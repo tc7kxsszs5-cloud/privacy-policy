@@ -27,6 +27,7 @@ export const GLB_ASSETS = {
   rolls_royce_ghost:                require('../assets/models/cars/rolls_royce_ghost.glb'),
   rolls_royce_boattail:             require('../assets/models/cars/rolls_royce_boattail.glb'),
   porsche_cayenne_turbo_gt_2022:    require('../assets/models/cars/porsche_cayenne_turbo_gt_2022.glb'),
+  mercedes_g_class:                 require('../assets/models/cars/mercedes_g_class.glb'),
 } as const
 
 export type GlbKey = keyof typeof GLB_ASSETS
