@@ -102,16 +102,18 @@ export const VIEWER_HTML = `<!DOCTYPE html>
 
     // ─── Protected meshes — cannot be colored ────────────────────────────────
     const PROTECTED = [
-      'light', 'Light', 'lamp', 'Lamp', 'headlight', 'Headlight',
-      'taillight', 'TailLight', 'tail_light', 'DRL', 'drl',
-      'turn', 'Turn', 'LED', 'led', 'lens', 'Lens',
-      'interior', 'Interior', 'seat', 'Seat', 'dashboard', 'Dashboard',
-      'cabin', 'Cabin', 'steering', 'Steering', 'brake', 'Brake',
-      'carpet', 'Carpet', 'trim_int', 'console', 'Console',
+      'light', 'lamp', 'headlight', 'taillight', 'tail_light', 'drl',
+      'turn', 'led', 'lens',
+      'interior', 'seat', 'dashboard',
+      'cabin', 'steering', 'brake',
+      'carpet', 'trim_int', 'console',
     ]
     function isProtected(name) {
       if (!name) return true
-      return PROTECTED.some(p => name.toLowerCase().includes(p.toLowerCase()))
+      // Split by underscores and non-alphanumeric to avoid false positives
+      // e.g. "Recycled" must not match "led", "Saturn" must not match "turn"
+      const tokens = name.toLowerCase().split(/[^a-z0-9]+/)
+      return tokens.some(tok => PROTECTED.includes(tok))
     }
 
     // Glass patterns → tint only
