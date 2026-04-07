@@ -18,6 +18,8 @@ type EditorStore = {
   meshNames: string[]
   partsConfig: Record<string, PartConfig>
   windowsConfig: Record<string, WindowConfig>
+  selectedStudioId: string | null
+  selectedStudioHashtag: string | null
 
   setCarId: (id: string, glbUrl: string | null) => void
   selectMesh: (meshName: string | null) => void
@@ -25,6 +27,8 @@ type EditorStore = {
   applyMaterial: (meshName: string, config: PartConfig) => void
   applyTint: (meshName: string, tintPercent: number) => void
   resetAll: () => void
+  selectStudio: (studioId: string, hashtag: string) => void
+  clearStudio: () => void
 }
 
 export const useEditorStore = create<EditorStore>((set) => ({
@@ -34,6 +38,8 @@ export const useEditorStore = create<EditorStore>((set) => ({
   meshNames: [],
   partsConfig: {},
   windowsConfig: {},
+  selectedStudioId: null,
+  selectedStudioHashtag: null,
 
   setCarId: (id, glbUrl) => set(s => s.carId === id
     ? { glbUrl }
@@ -46,4 +52,6 @@ export const useEditorStore = create<EditorStore>((set) => ({
   applyTint: (meshName, tintPercent) =>
     set(s => ({ windowsConfig: { ...s.windowsConfig, [meshName]: { tintPercent } } })),
   resetAll: () => set({ partsConfig: {}, windowsConfig: {}, selectedMesh: null }),
+  selectStudio: (studioId, hashtag) => set({ selectedStudioId: studioId, selectedStudioHashtag: hashtag }),
+  clearStudio: () => set({ selectedStudioId: null, selectedStudioHashtag: null }),
 }))

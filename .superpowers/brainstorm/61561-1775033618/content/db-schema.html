@@ -1,0 +1,112 @@
+<h2>Изменения в базе данных</h2>
+<p class="subtitle">Что добавляем для мультитенанта — минимум изменений, максимум результата</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0">
+
+  <!-- studio_profiles -->
+  <div style="background:#1e1e2e;border:2px solid #C9A84C;border-radius:12px;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="color:#C9A84C;margin:0;font-size:14px">🏪 studio_profiles</h3>
+      <span style="background:#C9A84C22;color:#C9A84C;font-size:11px;padding:2px 8px;border-radius:4px">1 изменение</span>
+    </div>
+    <div style="font-family:monospace;font-size:12px;line-height:2">
+      <div style="color:#666">id</div>
+      <div style="color:#666">user_id</div>
+      <div style="color:#666">name</div>
+      <div style="color:#666">description</div>
+      <div style="color:#666">address</div>
+      <div style="color:#666">phone, telegram, whatsapp</div>
+      <div style="background:#C9A84C22;color:#C9A84C;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0">
+        + hashtag <span style="color:#666">— уникальный #тег студии</span>
+      </div>
+      <div style="background:#C9A84C22;color:#C9A84C;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0">
+        + country <span style="color:#666">— страна студии</span>
+      </div>
+      <div style="background:#C9A84C22;color:#C9A84C;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0">
+        + language <span style="color:#666">— язык интерфейса</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- studio_works -->
+  <div style="background:#1e1e2e;border:2px solid #a8e6cf;border-radius:12px;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="color:#a8e6cf;margin:0;font-size:14px">🖼️ studio_works</h3>
+      <span style="background:#a8e6cf22;color:#a8e6cf;font-size:11px;padding:2px 8px;border-radius:4px">2 изменения</span>
+    </div>
+    <div style="font-family:monospace;font-size:12px;line-height:2">
+      <div style="color:#666">id</div>
+      <div style="color:#a8e6cf">studio_id ← уже есть</div>
+      <div style="color:#666">photo_url</div>
+      <div style="color:#666">created_at</div>
+      <div style="background:#a8e6cf22;color:#a8e6cf;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0">
+        + caption <span style="color:#666">— описание работы</span>
+      </div>
+      <div style="background:#a8e6cf22;color:#a8e6cf;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0">
+        + car_make, car_model <span style="color:#666">— марка авто</span>
+      </div>
+      <div style="background:#a8e6cf22;color:#a8e6cf;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0">
+        + service_type <span style="color:#666">— тип работы (винил, ппф...)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- orders -->
+  <div style="background:#1e1e2e;border:2px solid #7eb8f7;border-radius:12px;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="color:#7eb8f7;margin:0;font-size:14px">📋 orders</h3>
+      <span style="background:#7eb8f722;color:#7eb8f7;font-size:11px;padding:2px 8px;border-radius:4px">без изменений</span>
+    </div>
+    <div style="font-family:monospace;font-size:12px;line-height:2">
+      <div style="color:#7eb8f7">studio_id ← уже есть ✅</div>
+      <div style="color:#7eb8f7">client_id ← уже есть ✅</div>
+      <div style="color:#666">car_id, car_name</div>
+      <div style="color:#666">parts_config, windows_config</div>
+      <div style="color:#666">status</div>
+      <div style="color:#666">client_notes, studio_notes</div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:#e8a0bf">
+      ⚠️ Только убираем .limit(1) в коде
+    </div>
+  </div>
+
+  <!-- notifications (new) -->
+  <div style="background:#1e1e2e;border:2px dashed #e8a0bf;border-radius:12px;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="color:#e8a0bf;margin:0;font-size:14px">🔔 push_tokens</h3>
+      <span style="background:#e8a0bf22;color:#e8a0bf;font-size:11px;padding:2px 8px;border-radius:4px">новая таблица</span>
+    </div>
+    <div style="font-family:monospace;font-size:12px;line-height:2">
+      <div style="color:#e8a0bf">user_id</div>
+      <div style="color:#e8a0bf">expo_push_token</div>
+      <div style="color:#e8a0bf">platform (ios/android)</div>
+      <div style="color:#e8a0bf">created_at</div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:#888">
+      Expo Push API — бесплатно
+    </div>
+  </div>
+
+</div>
+
+<div style="background:#0f1117;border:1px solid #333;border-radius:12px;padding:16px">
+  <h3 style="color:#fff;margin:0 0 12px;font-size:14px">📊 Итого изменений в БД</h3>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center">
+    <div>
+      <div style="color:#C9A84C;font-size:24px;font-weight:bold">3</div>
+      <div style="color:#888;font-size:12px">новых поля в<br>studio_profiles</div>
+    </div>
+    <div>
+      <div style="color:#a8e6cf;font-size:24px;font-weight:bold">3</div>
+      <div style="color:#888;font-size:12px">новых поля в<br>studio_works</div>
+    </div>
+    <div>
+      <div style="color:#7eb8f7;font-size:24px;font-weight:bold">0</div>
+      <div style="color:#888;font-size:12px">изменений в<br>orders</div>
+    </div>
+    <div>
+      <div style="color:#e8a0bf;font-size:24px;font-weight:bold">1</div>
+      <div style="color:#888;font-size:12px">новая таблица<br>push_tokens</div>
+    </div>
+  </div>
+</div>

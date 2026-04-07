@@ -1,0 +1,8 @@
+{"type":"server-started","port":49629,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:49629","screen_dir":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/content","state_dir":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/state"}
+{"type":"screen-added","file":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/content/storage-arch.html"}
+{"type":"screen-added","file":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/content/user-flow.html"}
+{"type":"screen-added","file":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/content/db-schema.html"}
+{"type":"screen-added","file":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/content/ui-mockups.html"}
+{"type":"screen-added","file":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/content/gallery-redesign.html"}
+{"type":"screen-added","file":"/Users/mac/dev/carwrap/.superpowers/brainstorm/61561-1775033618/content/gallery-choice.html"}
+{"type":"server-stopped","reason":"idle timeout"}

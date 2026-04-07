@@ -1,0 +1,49 @@
+<h2>Какой формат галереи выбрать?</h2>
+<p class="subtitle">Два варианта — выбери что ближе по нажатию</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>2 колонки — крупные фото</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:10px 0;border-radius:6px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#2a1a1a,#3a2a1a);height:65px;border-radius:4px"></div>
+        <div style="background:linear-gradient(135deg,#1a2a1a,#2a3a2a);height:65px;border-radius:4px"></div>
+        <div style="background:linear-gradient(135deg,#1a1a2a,#2a2a3a);height:65px;border-radius:4px"></div>
+        <div style="background:linear-gradient(135deg,#2a2a1a,#3a3a2a);height:65px;border-radius:4px"></div>
+      </div>
+      <p>Детали работ хорошо видны. Меньше фото на экране, зато каждое крупное.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Детали работ видны сразу</li><li>Красиво смотрится</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>Меньше работ на экране</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>3 колонки — как Instagram</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin:10px 0;border-radius:6px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#2a1a1a,#3a2a1a);height:44px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a2a1a,#2a3a2a);height:44px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a1a2a,#2a2a3a);height:44px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#2a2a1a,#3a3a2a);height:44px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#2a1a2a,#3a2a3a);height:44px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a2a2a,#2a3a3a);height:44px;border-radius:3px"></div>
+      </div>
+      <p>Больше работ сразу видно. Тап открывает полное фото. Привычный паттерн.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Больше работ видно сразу</li><li>Привычно — как Instagram</li><li>Чуть легче для памяти</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>Фото мелковаты на маленьком экране</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:16px;padding:14px;background:#1a1a2e;border-radius:8px;border-left:4px solid #C9A84C">
+  <strong style="color:#C9A84C">По производительности — оба одинаковы.</strong>
+  <span style="color:#ccc;font-size:13px;margin-left:8px">Фото грузятся лениво в обоих случаях. Список студий остаётся лёгким текстом — это уже решено.</span>
+</div>

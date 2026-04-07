@@ -36,17 +36,23 @@ export async function createOrder(order: {
   parts_config: PartConfig[]
   windows_config: WindowConfig[]
   client_notes?: string
+  studio_id?: string | null
 }): Promise<Order> {
-  // Get studio id (MVP: single studio)
-  const { data: studio } = await supabase
-    .from('studio_profiles')
-    .select('id')
-    .limit(1)
-    .single()
+  let studioId = order.studio_id ?? null
+
+  // Если студия не выбрана — берём первую (fallback)
+  if (!studioId) {
+    const { data: studio } = await supabase
+      .from('studio_profiles')
+      .select('id')
+      .limit(1)
+      .single()
+    studioId = studio?.id ?? null
+  }
 
   const { data, error } = await supabase
     .from('orders')
-    .insert({ ...order, studio_id: studio?.id ?? null })
+    .insert({ ...order, studio_id: studioId })
     .select()
     .single()
   if (error) throw new Error(error.message)

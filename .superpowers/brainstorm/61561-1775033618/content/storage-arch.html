@@ -1,0 +1,64 @@
+<h2>Где хранятся фотографии студий</h2>
+<p class="subtitle">Архитектура хранилища — всё уже включено в Supabase</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0">
+
+  <div style="background:#1e1e2e;border:1px solid #C9A84C;border-radius:12px;padding:20px">
+    <div style="font-size:28px;margin-bottom:8px">📱</div>
+    <h3 style="color:#C9A84C;margin:0 0 8px">Приложение</h3>
+    <p style="color:#aaa;font-size:13px;margin:0">iOS App (сейчас)<br>Web App (следующий этап)<br>Android App (позже)</p>
+    <div style="margin-top:12px;font-size:12px;color:#666">Expo / React Native</div>
+  </div>
+
+  <div style="background:#1e1e2e;border:1px solid #3d7aed;border-radius:12px;padding:20px">
+    <div style="font-size:28px;margin-bottom:8px">☁️</div>
+    <h3 style="color:#3d7aed;margin:0 0 8px">Supabase Storage</h3>
+    <p style="color:#aaa;font-size:13px;margin:0">Bucket <code>studio-photos</code><br>Фото работ каждой студии<br>До 1GB — бесплатно</p>
+    <div style="margin-top:12px;font-size:12px;color:#666">Встроенный CDN</div>
+  </div>
+
+  <div style="background:#1e1e2e;border:1px solid #3d7aed;border-radius:12px;padding:20px">
+    <div style="font-size:28px;margin-bottom:8px">🗄️</div>
+    <h3 style="color:#3d7aed;margin:0 0 8px">Supabase Database</h3>
+    <p style="color:#aaa;font-size:13px;margin:0">Метаданные фото<br>studio_id, hashtag, описание<br>URL фото в Storage</p>
+    <div style="margin-top:12px;font-size:12px;color:#666">PostgreSQL</div>
+  </div>
+
+  <div style="background:#1e1e2e;border:1px solid #555;border-radius:12px;padding:20px">
+    <div style="font-size:28px;margin-bottom:8px">🗃️</div>
+    <h3 style="color:#aaa;margin:0 0 8px">Архивирование</h3>
+    <p style="color:#aaa;font-size:13px;margin:0">Старые фото → Supabase S3<br>или Cloudflare R2<br>~$0.015 за GB/мес</p>
+    <div style="margin-top:12px;font-size:12px;color:#666">Холодное хранилище</div>
+  </div>
+
+</div>
+
+<div style="background:#0f1117;border:1px solid #333;border-radius:12px;padding:20px;margin-top:8px">
+  <h3 style="color:#fff;margin:0 0 16px">Как это работает пошагово</h3>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center">
+    <div>
+      <div style="background:#C9A84C;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-weight:bold;color:#000">1</div>
+      <div style="font-size:12px;color:#aaa">Студия загружает фото через приложение</div>
+    </div>
+    <div>
+      <div style="background:#C9A84C;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-weight:bold;color:#000">2</div>
+      <div style="font-size:12px;color:#aaa">Фото сохраняется в Supabase Storage</div>
+    </div>
+    <div>
+      <div style="background:#C9A84C;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-weight:bold;color:#000">3</div>
+      <div style="font-size:12px;color:#aaa">URL + метаданные записываются в БД</div>
+    </div>
+    <div>
+      <div style="background:#C9A84C;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-weight:bold;color:#000">4</div>
+      <div style="font-size:12px;color:#aaa">CDN раздаёт фото пользователям по всему миру</div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:16px;padding:16px;background:#1a1a2e;border-radius:8px;border-left:4px solid #C9A84C">
+  <strong style="color:#C9A84C">Вывод:</strong>
+  <span style="color:#ccc;font-size:14px;margin-left:8px">
+    Всё хранилище уже настроено в Supabase. Бакет <code>studio-photos</code> уже создан.
+    Нужно только добавить поле <code>studio_id</code> к фотографиям — и мультитенант готов.
+  </span>
+</div>

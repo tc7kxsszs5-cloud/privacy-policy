@@ -62,9 +62,14 @@ export default function StudioDashboard() {
     <SafeAreaView style={styles.root} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>Заявки</Text>
-        <TouchableOpacity onPress={() => router.push('/studio/setup')}>
-          <Text style={styles.setupText}>Настройки</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={() => router.push('/studio/upload-works' as any)}>
+            <Text style={styles.setupText}>Галерея</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/studio/setup')}>
+            <Text style={styles.setupText}>Настройки</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {loading ? (
@@ -117,6 +122,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingVertical: 16,
   },
   title: { color: '#fff', fontSize: 24, fontWeight: '800', letterSpacing: 0.5 },
+  headerActions: { flexDirection: 'row', gap: 16 },
   setupText: { color: '#C9A84C', fontSize: 14 },
   list: { padding: 20, paddingBottom: 48 },
   emptyBlock: { padding: 32, alignItems: 'center' },

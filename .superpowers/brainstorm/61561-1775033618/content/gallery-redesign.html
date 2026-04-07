@@ -1,0 +1,126 @@
+<h2>Раздел «Наши работы» — переработанная структура</h2>
+<p class="subtitle">Два уровня: список студий → галерея конкретной студии</p>
+
+<div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:0;align-items:center;margin:24px 0">
+
+  <!-- Screen 1: Studios List -->
+  <div>
+    <div style="text-align:center;margin-bottom:10px">
+      <span style="color:#C9A84C;font-weight:bold;font-size:13px">Уровень 1 — Список студий</span><br>
+      <span style="color:#666;font-size:11px">Лёгкий экран, без тяжёлых фото</span>
+    </div>
+    <div style="background:#111;border-radius:20px;padding:14px;border:1px solid #333;max-width:220px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#555;margin-bottom:10px">
+        <span>9:41</span><span>●●●</span>
+      </div>
+      <div style="color:#fff;font-weight:bold;font-size:14px;margin-bottom:14px">Наши работы</div>
+
+      <!-- Studio card 1 -->
+      <div style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:8px;height:56px;background:linear-gradient(135deg,#1a1a2e 0%,#2a2020 100%);border:1px solid #333">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(201,168,76,0.15),transparent)"></div>
+        <div style="position:absolute;inset:0;padding:10px 14px;display:flex;flex-direction:column;justify-content:center">
+          <div style="color:#fff;font-size:12px;font-weight:600">Detailing Time</div>
+          <div style="color:#C9A84C;font-size:10px;margin-top:2px">#detailingtime · Москва · 128 работ</div>
+        </div>
+        <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#555;font-size:16px">›</div>
+      </div>
+
+      <!-- Studio card 2 -->
+      <div style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:8px;height:56px;background:linear-gradient(135deg,#1a2030,#20202a);border:1px solid #333">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(126,184,247,0.12),transparent)"></div>
+        <div style="position:absolute;inset:0;padding:10px 14px;display:flex;flex-direction:column;justify-content:center">
+          <div style="color:#fff;font-size:12px;font-weight:600">Wrap London</div>
+          <div style="color:#7eb8f7;font-size:10px;margin-top:2px">#wraplondon · London · 84 работы</div>
+        </div>
+        <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#555;font-size:16px">›</div>
+      </div>
+
+      <!-- Studio card 3 -->
+      <div style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:8px;height:56px;background:linear-gradient(135deg,#201a30,#1a2020);border:1px solid #333">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(232,160,191,0.12),transparent)"></div>
+        <div style="position:absolute;inset:0;padding:10px 14px;display:flex;flex-direction:column;justify-content:center">
+          <div style="color:#fff;font-size:12px;font-weight:600">AutoFolie Berlin</div>
+          <div style="color:#e8a0bf;font-size:10px;margin-top:2px">#autofolie_de · Berlin · 56 работ</div>
+        </div>
+        <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#555;font-size:16px">›</div>
+      </div>
+
+      <!-- Studio card 4 -->
+      <div style="position:relative;border-radius:10px;overflow:hidden;height:56px;background:linear-gradient(135deg,#1a2e20,#202020);border:1px solid #333">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(168,230,207,0.12),transparent)"></div>
+        <div style="position:absolute;inset:0;padding:10px 14px;display:flex;flex-direction:column;justify-content:center">
+          <div style="color:#fff;font-size:12px;font-weight:600">Dubai Wrap Studio</div>
+          <div style="color:#a8e6cf;font-size:10px;margin-top:2px">#dubaiwrap · Dubai · 42 работы</div>
+        </div>
+        <div style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#555;font-size:16px">›</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div style="text-align:center;color:#C9A84C;font-size:22px">→</div>
+
+  <!-- Screen 2: Studio Gallery -->
+  <div>
+    <div style="text-align:center;margin-bottom:10px">
+      <span style="color:#7eb8f7;font-weight:bold;font-size:13px">Уровень 2 — Галерея студии</span><br>
+      <span style="color:#666;font-size:11px">Сетка реальных фото, маленькие блоки</span>
+    </div>
+    <div style="background:#111;border-radius:20px;padding:14px;border:1px solid #333;max-width:220px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#555;margin-bottom:8px">
+        <span>9:41</span><span>●●●</span>
+      </div>
+      <!-- Back + header -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="color:#C9A84C;font-size:11px">←</span>
+        <span style="color:#fff;font-weight:bold;font-size:13px">Detailing Time</span>
+      </div>
+      <div style="color:#C9A84C;font-size:10px;margin-bottom:12px">#detailingtime · 128 работ</div>
+
+      <!-- Photo grid — 3 columns -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;border-radius:8px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#2a1a1a,#3a2a1a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a2a1a,#2a3a2a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a1a2a,#2a2a3a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#2a2a1a,#3a3a2a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#2a1a2a,#3a2a3a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a2a2a,#2a3a3a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#3a1a1a,#4a2a1a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a3a1a,#2a4a2a);height:54px;border-radius:3px"></div>
+        <div style="background:linear-gradient(135deg,#1a1a3a,#2a2a4a);height:54px;border-radius:3px"></div>
+      </div>
+
+      <div style="color:#666;font-size:9px;text-align:center;margin-top:8px">↕ скролл · реальные фото студии</div>
+
+      <!-- CTA -->
+      <div style="background:#C9A84C;border-radius:8px;padding:8px;text-align:center;color:#000;font-size:11px;font-weight:bold;margin-top:10px">
+        Отправить заявку в эту студию
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="background:#0f1117;border:1px solid #333;border-radius:12px;padding:16px;margin-top:8px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <div style="color:#C9A84C;font-size:12px;font-weight:bold;margin-bottom:8px">Список студий — почему так быстро</div>
+      <ul style="color:#888;font-size:12px;margin:0;padding-left:16px;line-height:1.9">
+        <li>Нет тяжёлых изображений — только текст + градиент</li>
+        <li>Загружается мгновенно даже на слабом интернете</li>
+        <li>Цвет акцента = уникальный цвет студии (из хэштега)</li>
+        <li>Счётчик работ показывает активность студии</li>
+      </ul>
+    </div>
+    <div>
+      <div style="color:#7eb8f7;font-size:12px;font-weight:bold;margin-bottom:8px">Галерея студии — оптимизация</div>
+      <ul style="color:#888;font-size:12px;margin:0;padding-left:16px;line-height:1.9">
+        <li>Фото загружаются по ленивой загрузке (по мере скролла)</li>
+        <li>Supabase CDN отдаёт сжатые превью (thumbnail)</li>
+        <li>3 колонки — максимум информации на экране</li>
+        <li>Тап на фото → полный просмотр</li>
+      </ul>
+    </div>
+  </div>
+</div>

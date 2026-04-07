@@ -1,36 +1,89 @@
 import { useEffect, useState } from 'react'
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Modal, Dimensions, ActivityIndicator } from 'react-native'
+import {
+  View, Text, FlatList, Image, TouchableOpacity,
+  StyleSheet, Modal, Dimensions, ActivityIndicator, Alert,
+} from 'react-native'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { supabase } from '@/constants/supabase'
+import { useEditorStore } from '@/constants/editor-store'
 
 type StudioWork = {
   id: string
+  studio_id: string
   photo_url: string
   description: string | null
   hashtag: string
   created_at: string
 }
 
+type Studio = {
+  id: string
+  name: string
+  hashtag: string
+  works: StudioWork[]
+}
+
 const { width } = Dimensions.get('window')
-const ITEM_SIZE = (width - 48) / 2
 
 export default function GalleryScreen() {
   const router = useRouter()
-  const [works, setWorks] = useState<StudioWork[]>([])
+  const selectStudio = useEditorStore(s => s.selectStudio)
+  const selectedStudioId = useEditorStore(s => s.selectedStudioId)
+
+  const [studios, setStudios] = useState<Studio[]>([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<StudioWork | null>(null)
 
   useEffect(() => {
-    supabase
-      .from('studio_works')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        if (data) setWorks(data)
-        setLoading(false)
-      })
+    loadGallery()
   }, [])
+
+  async function loadGallery() {
+    const [{ data: works }, { data: profiles }] = await Promise.all([
+      supabase.from('studio_works').select('*').order('created_at', { ascending: false }),
+      supabase.from('studio_profiles').select('id, name, hashtag'),
+    ])
+
+    if (!profiles) { setLoading(false); return }
+
+    const map: Record<string, Studio> = {}
+    for (const p of profiles) {
+      map[p.id] = {
+        id: p.id,
+        name: p.name,
+        hashtag: p.hashtag || `#${p.name.toLowerCase().replace(/\s+/g, '')}`,
+        works: [],
+      }
+    }
+    for (const w of works ?? []) {
+      if (map[w.studio_id]) map[w.studio_id].works.push(w)
+    }
+
+    setStudios(Object.values(map).filter(s => s.works.length > 0))
+    setLoading(false)
+  }
+
+  function handleSelectStudio(studio: Studio) {
+    Alert.alert(
+      `Выбрать ${studio.hashtag}?`,
+      `Заявки будут отправляться в студию "${studio.name}"`,
+      [
+        { text: 'Отмена', style: 'cancel' },
+        {
+          text: 'Выбрать',
+          onPress: () => {
+            selectStudio(studio.id, studio.hashtag)
+            Alert.alert(
+              'Студия выбрана',
+              `${studio.hashtag} сохранён. Теперь создайте конфигурацию и отправьте заявку.`,
+              [{ text: 'OK' }]
+            )
+          },
+        },
+      ]
+    )
+  }
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
@@ -46,25 +99,61 @@ export default function GalleryScreen() {
         <View style={styles.center}>
           <ActivityIndicator color="#C9A84C" />
         </View>
-      ) : works.length === 0 ? (
+      ) : studios.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.empty}>Работы скоро появятся</Text>
           <Text style={styles.emptySub}>#detailingtime</Text>
         </View>
       ) : (
         <FlatList
-          data={works}
-          keyExtractor={w => w.id}
-          numColumns={2}
-          contentContainerStyle={styles.grid}
-          columnWrapperStyle={styles.row}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.item} onPress={() => setSelected(item)} activeOpacity={0.85}>
-              <Image source={{ uri: item.photo_url }} style={styles.photo} resizeMode="cover" />
-              <View style={styles.overlay}>
-                <Text style={styles.hashtag}>{item.hashtag}</Text>
+          data={studios}
+          keyExtractor={s => s.id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item: studio }) => (
+            <View style={styles.studioSection}>
+              {/* Studio header */}
+              <View style={styles.studioHeader}>
+                <View>
+                  <Text style={styles.studioHashtag}>{studio.hashtag}</Text>
+                  <Text style={styles.studioName}>{studio.name}</Text>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.selectBtn,
+                    selectedStudioId === studio.id && styles.selectBtnActive,
+                  ]}
+                  onPress={() => handleSelectStudio(studio)}
+                >
+                  <Text style={[
+                    styles.selectBtnText,
+                    selectedStudioId === studio.id && styles.selectBtnTextActive,
+                  ]}>
+                    {selectedStudioId === studio.id ? '✓ Выбрано' : 'Выбрать'}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+
+              {/* Works row */}
+              <FlatList
+                data={studio.works}
+                keyExtractor={w => w.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.worksRow}
+                renderItem={({ item: work }) => (
+                  <TouchableOpacity
+                    style={styles.workThumb}
+                    onPress={() => setSelected(work)}
+                    activeOpacity={0.85}
+                  >
+                    <Image source={{ uri: work.photo_url }} style={styles.workPhoto} resizeMode="cover" />
+                    <View style={styles.workOverlay}>
+                      <Text style={styles.workHashtag}>{work.hashtag}</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
           )}
         />
       )}
@@ -83,7 +172,9 @@ export default function GalleryScreen() {
                   <Text style={styles.modalDesc}>{selected.description}</Text>
                   <Text style={styles.modalHashtag}>{selected.hashtag}</Text>
                 </View>
-              ) : null}
+              ) : (
+                <Text style={styles.modalHashtag}>{selected.hashtag}</Text>
+              )}
             </>
           )}
         </View>
@@ -103,19 +194,42 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   empty: { color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 8 },
   emptySub: { color: '#C9A84C', fontSize: 14 },
-  grid: { padding: 16, paddingTop: 8 },
-  row: { justifyContent: 'space-between', marginBottom: 12 },
-  item: {
-    width: ITEM_SIZE, height: ITEM_SIZE,
-    borderRadius: 16, overflow: 'hidden',
+
+  list: { paddingBottom: 48 },
+
+  studioSection: {
+    marginBottom: 28,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+    paddingBottom: 20,
+  },
+  studioHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingBottom: 12,
+  },
+  studioHashtag: { color: '#C9A84C', fontSize: 17, fontWeight: '800' },
+  studioName: { color: '#555', fontSize: 12, marginTop: 2 },
+  selectBtn: {
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.4)',
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6,
+  },
+  selectBtnActive: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
+  selectBtnText: { color: '#C9A84C', fontSize: 13, fontWeight: '700' },
+  selectBtnTextActive: { color: '#0a0a0a' },
+
+  worksRow: { paddingHorizontal: 16, gap: 10 },
+  workThumb: {
+    width: 140, height: 105,
+    borderRadius: 12, overflow: 'hidden',
     borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)',
   },
-  photo: { width: '100%', height: '100%' },
-  overlay: {
+  workPhoto: { width: '100%', height: '100%' },
+  workOverlay: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 10, paddingVertical: 6,
+    backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 8, paddingVertical: 5,
   },
-  hashtag: { color: '#C9A84C', fontSize: 11, fontWeight: '700' },
+  workHashtag: { color: '#C9A84C', fontSize: 10, fontWeight: '700' },
+
   // Modal
   modal: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.95)',
@@ -130,5 +244,5 @@ const styles = StyleSheet.create({
   modalPhoto: { width: width, height: width * 1.1 },
   modalInfo: { padding: 24, alignItems: 'center' },
   modalDesc: { color: '#fff', fontSize: 15, textAlign: 'center', marginBottom: 6 },
-  modalHashtag: { color: '#C9A84C', fontSize: 13, fontWeight: '700' },
+  modalHashtag: { color: '#C9A84C', fontSize: 13, fontWeight: '700', marginTop: 8 },
 })

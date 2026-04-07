@@ -58,6 +58,9 @@ export default function HomeScreen() {
                 <Text style={styles.navLink}>Заявки</Text>
               </TouchableOpacity>
             ) : null}
+            <TouchableOpacity style={styles.assistantBtn} onPress={() => router.push('/assistant')}>
+              <Text style={styles.assistantIcon}>✦</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -216,8 +219,15 @@ const styles = StyleSheet.create({
   },
   logo: { color: '#C9A84C', fontSize: 18, fontWeight: '900', letterSpacing: 3 },
   logoSub: { color: '#555', fontSize: 11, letterSpacing: 1, marginTop: 2 },
-  navRight: { flexDirection: 'row', gap: 20 },
+  navRight: { flexDirection: 'row', gap: 16, alignItems: 'center' },
   navLink: { color: '#888', fontSize: 15 },
+  assistantBtn: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: 'rgba(201,168,76,0.15)',
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.4)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  assistantIcon: { color: '#C9A84C', fontSize: 16, fontWeight: '800' },
 
   // HERO
   heroCard: {

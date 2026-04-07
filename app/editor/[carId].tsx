@@ -26,6 +26,7 @@ export default function EditorScreen() {
 
   const {
     selectedMesh, partsConfig, windowsConfig,
+    selectedStudioId, selectedStudioHashtag,
     setCarId, selectMesh, applyMaterial, applyTint, resetAll,
   } = useEditorStore()
 
@@ -113,6 +114,19 @@ export default function EditorScreen() {
       return Alert.alert('Выберите хотя бы один элемент', 'Нажмите на деталь машины чтобы изменить цвет')
     }
 
+    // Если студия не выбрана — предложить выбрать
+    if (!selectedStudioId) {
+      Alert.alert(
+        'Выберите студию',
+        'Посмотрите галерею работ и выберите студию по хэштегу',
+        [
+          { text: 'Отмена', style: 'cancel' },
+          { text: 'Выбрать студию', onPress: () => router.push('/studio/select-studio' as any) },
+        ]
+      )
+      return
+    }
+
     try {
       await createOrder({
         client_id: user.id,
@@ -120,16 +134,17 @@ export default function EditorScreen() {
         car_name: carName ?? '',
         parts_config: partsArray as any,
         windows_config: windowsArray as any,
+        studio_id: selectedStudioId,
       })
       Alert.alert(
         'Заявка отправлена!',
-        'Мы получили вашу конфигурацию. Приезжайте в студию Флор для согласования и оплаты.',
+        `Заявка отправлена в студию ${selectedStudioHashtag}. Ожидайте подтверждения.`,
         [{ text: 'Мои заявки', onPress: () => router.push('/orders') }, { text: 'OK' }]
       )
     } catch (e: any) {
       Alert.alert('Ошибка', e.message)
     }
-  }, [user, carId, partsConfig, windowsConfig, router])
+  }, [user, carId, partsConfig, windowsConfig, selectedStudioId, selectedStudioHashtag, router])
 
   const handleShare = useCallback(async () => {
     await Share.share({ message: `CarWrap конфигурация машины — carwrap://editor/${carId}` })
@@ -158,6 +173,11 @@ export default function EditorScreen() {
             : <>
                 {partsCount > 0 && <Text style={styles.stat}>{partsCount} деталей</Text>}
                 {tintCount > 0 && <Text style={styles.stat}>{tintCount} стёкол</Text>}
+                <TouchableOpacity onPress={() => router.push('/studio/select-studio' as any)}>
+                  <Text style={selectedStudioHashtag ? styles.studioSelected : styles.studioPick}>
+                    {selectedStudioHashtag ?? '+ Студия'}
+                  </Text>
+                </TouchableOpacity>
               </>
           }
         </View>
@@ -209,9 +229,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(10,10,10,0.95)',
     padding: 16, paddingBottom: 32,
   },
-  stats: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  stats: { flexDirection: 'row', gap: 12, marginBottom: 12, alignItems: 'center' },
   stat: { color: '#666', fontSize: 12 },
   selectedMesh: { color: '#C9A84C', fontSize: 12, fontWeight: '600' },
+  studioPick: { color: '#555', fontSize: 12, borderWidth: 1, borderColor: '#333', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
+  studioSelected: { color: '#C9A84C', fontSize: 12, fontWeight: '700', borderWidth: 1, borderColor: '#C9A84C', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
   actions: { flexDirection: 'row', gap: 8 },
   btnSecondary: {
     flex: 1, padding: 14, borderRadius: 12, borderWidth: 1,
