@@ -2,7 +2,7 @@
   "expo": {
     "name": "Detailing Time",
     "slug": "carwrap",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "scheme": "detailingtime",
     "icon": "./assets/icon.png",
     "splash": {
