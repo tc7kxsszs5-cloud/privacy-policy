@@ -25,7 +25,7 @@ export const STUDIO_INFO = {
   phone: '+74954111003',
   phone_display: '+7 (495) 411-10-03',
   telegram: '@flor_detailing',
-  whatsapp: '74954111003',
+  whatsapp: '79854111003',
   hours: 'Ежедневно 10:00 – 20:00',
 }
 
