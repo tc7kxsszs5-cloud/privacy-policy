@@ -85,44 +85,55 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* ── CARDS ROW 1: две узкие ── */}
-        <View style={styles.row}>
-          {/* 3D Конфигуратор */}
-          <TouchableOpacity
-            style={[styles.halfCard, { marginRight: 6 }]}
-            onPress={() => router.push('/studio/gallery' as any)}
-            activeOpacity={0.85}
-          >
-            <Image
-              source={require('@/assets/services/vinyl.jpg')}
-              style={styles.cardImage}
-              resizeMode="cover"
-            />
-            <View style={styles.cardOverlay} />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>Наши работы</Text>
-              <Text style={styles.cardDesc}>Фото работ студии</Text>
+        {/* ── НАШИ РАБОТЫ — широкая большая ── */}
+        <TouchableOpacity
+          style={styles.featuredCard}
+          onPress={() => router.push('/studio/gallery' as any)}
+          activeOpacity={0.88}
+        >
+          <Image
+            source={require('@/assets/services/vinyl.jpg')}
+            style={styles.wideImage}
+            resizeMode="cover"
+          />
+          <View style={styles.wideOverlayTop} />
+          <View style={styles.wideOverlayBottom} />
+          <View style={styles.wideContent}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>ПОРТФОЛИО</Text>
             </View>
-          </TouchableOpacity>
+            <Text style={styles.wideTitle}>Наши работы</Text>
+            <Text style={styles.wideDesc}>
+              Реальные проекты студии — оклейка, тонировка, PPF и детейлинг.
+            </Text>
+            <Text style={styles.wideLink}>Смотреть галерею →</Text>
+          </View>
+        </TouchableOpacity>
 
-          {/* Оклейка авто */}
-          <TouchableOpacity
-            style={[styles.halfCard, { marginLeft: 6 }]}
-            onPress={() => router.push('/prices')}
-            activeOpacity={0.85}
-          >
-            <Image
-              source={require('@/assets/services/ppf.jpg')}
-              style={styles.cardImage}
-              resizeMode="cover"
-            />
-            <View style={styles.cardOverlay} />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>Оклейка авто</Text>
-              <Text style={styles.cardDesc}>Услуги и прайс-лист</Text>
+        {/* ── ОКЛЕЙКА АВТО — широкая ── */}
+        <TouchableOpacity
+          style={styles.wideCard}
+          onPress={() => router.push('/prices')}
+          activeOpacity={0.88}
+        >
+          <Image
+            source={require('@/assets/services/ppf.jpg')}
+            style={styles.wideImage}
+            resizeMode="cover"
+          />
+          <View style={styles.wideOverlayTop} />
+          <View style={styles.wideOverlayBottom} />
+          <View style={styles.wideContent}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>УСЛУГИ</Text>
             </View>
-          </TouchableOpacity>
-        </View>
+            <Text style={styles.wideTitle}>Оклейка авто</Text>
+            <Text style={styles.wideDesc}>
+              Виниловая плёнка, PPF, тонировка, детейлинг — полный прайс-лист.
+            </Text>
+            <Text style={styles.wideLink}>Смотреть цены →</Text>
+          </View>
+        </TouchableOpacity>
 
         {/* ── ЛЕКАЛЬНАЯ НАРЕЗКА — широкая ── */}
         <TouchableOpacity
@@ -146,31 +157,6 @@ export default function HomeScreen() {
               Плоттер режет по точным цифровым шаблонам — PPF, тонировка, винил. Нет ножа по краске, нет зазубрин.
             </Text>
             <Text style={styles.wideLink}>Подробнее →</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* ── 3D КОНФИГУРАТОР — широкая ── */}
-        <TouchableOpacity
-          style={styles.wideCard}
-          onPress={() => router.push('/catalog')}
-          activeOpacity={0.88}
-        >
-          <Image
-            source={require('@/assets/services/vinyl.jpg')}
-            style={styles.wideImage}
-            resizeMode="cover"
-          />
-          <View style={styles.wideOverlayTop} />
-          <View style={styles.wideOverlayBottom} />
-          <View style={styles.wideContent}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>3D КОНФИГУРАТОР</Text>
-            </View>
-            <Text style={styles.wideTitle}>Выбери цвет{'\n'}на своём авто</Text>
-            <Text style={styles.wideDesc}>
-              Найди свой автомобиль, нажми на деталь и подбери цвет из 105 реальных оттенков плёнки.
-            </Text>
-            <Text style={styles.wideLink}>Открыть конфигуратор →</Text>
           </View>
         </TouchableOpacity>
 
@@ -257,27 +243,13 @@ const styles = StyleSheet.create({
   },
   heroCtaText: { color: '#000', fontSize: 15, fontWeight: '800' },
 
-  // HALF CARDS (2-column row)
-  row: { flexDirection: 'row', marginBottom: 12 },
-  halfCard: {
-    flex: 1, borderRadius: 20, overflow: 'hidden',
-    height: 200, borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)',
-  },
-  cardImage: { position: 'absolute', width: '100%', height: '100%' },
-  cardOverlay: {
-    position: 'absolute', width: '100%', height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.58)',
-  },
-  cardContent: {
-    flex: 1, padding: 16, justifyContent: 'flex-end',
-  },
-  cardTitle: {
-    color: '#fff', fontSize: 16, fontWeight: '800',
-    marginBottom: 6, minWidth: 0,
-  },
-  cardDesc: { color: 'rgba(255,255,255,0.6)', fontSize: 12, lineHeight: 17 },
 
   // WIDE CARDS
+  featuredCard: {
+    borderRadius: 20, overflow: 'hidden',
+    marginBottom: 12, height: 300,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
+  },
   wideCard: {
     borderRadius: 20, overflow: 'hidden',
     marginBottom: 12, height: 220,
