@@ -53,11 +53,6 @@ export default function HomeScreen() {
                 <Text style={styles.navLink}>Дашборд</Text>
               </TouchableOpacity>
             )}
-            {user ? (
-              <TouchableOpacity onPress={() => router.push('/orders')}>
-                <Text style={styles.navLink}>Заявки</Text>
-              </TouchableOpacity>
-            ) : null}
             <TouchableOpacity style={styles.assistantBtn} onPress={() => router.push('/assistant')}>
               <Text style={styles.assistantIcon}>✦</Text>
             </TouchableOpacity>
@@ -154,14 +149,14 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* ── ЗАЯВКА ОНЛАЙН — широкая ── */}
+        {/* ── 3D КОНФИГУРАТОР — широкая ── */}
         <TouchableOpacity
           style={styles.wideCard}
-          onPress={() => router.push('/orders')}
+          onPress={() => router.push('/catalog')}
           activeOpacity={0.88}
         >
           <Image
-            source={require('@/assets/services/ceramic.jpg')}
+            source={require('@/assets/services/vinyl.jpg')}
             style={styles.wideImage}
             resizeMode="cover"
           />
@@ -169,35 +164,35 @@ export default function HomeScreen() {
           <View style={styles.wideOverlayBottom} />
           <View style={styles.wideContent}>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>ЗАЯВКА ОНЛАЙН</Text>
+              <Text style={styles.badgeText}>3D КОНФИГУРАТОР</Text>
             </View>
-            <Text style={styles.wideTitle}>Отправь конфигурацию</Text>
+            <Text style={styles.wideTitle}>Выбери цвет{'\n'}на своём авто</Text>
             <Text style={styles.wideDesc}>
-              Настрой авто в 3D — приедь и оплати уже готовую работу. Без предоплаты.
+              Найди свой автомобиль, нажми на деталь и подбери цвет из 105 реальных оттенков плёнки.
             </Text>
-            <Text style={styles.wideLink}>Оставить заявку →</Text>
+            <Text style={styles.wideLink}>Открыть конфигуратор →</Text>
           </View>
         </TouchableOpacity>
 
-        {/* ── СТУДИЯ ── */}
-        <TouchableOpacity
-          style={styles.studioCard}
-          onPress={() => router.push('/studio')}
-          activeOpacity={0.88}
-        >
-          <Image
-            source={require('@/assets/services/moto_detailing.jpg')}
-            style={styles.studioImage}
-            resizeMode="cover"
-          />
-          <View style={styles.studioOverlay} />
-          <View style={styles.studioContent}>
-            <Text style={styles.studioLabel}>О студии</Text>
-            <Text style={styles.studioName}>Флор</Text>
-            <Text style={styles.studioAddress}>ул. Маршала Прошлякова, 14к2 · Москва</Text>
-            <Text style={styles.studioLink}>Прайс-лист, адрес, контакты →</Text>
+        {/* ── КАК ЭТО РАБОТАЕТ ── */}
+        <View style={styles.stepsCard}>
+          <Text style={styles.stepsTitle}>Как это работает</Text>
+          <View style={styles.stepsList}>
+            {[
+              { n: '01', title: 'Выбери авто', desc: 'Найди свою модель в каталоге' },
+              { n: '02', title: 'Настрой цвет', desc: 'Покрась каждую деталь в 3D' },
+              { n: '03', title: 'Отправь заявку', desc: 'Приедь в студию — оплата на месте' },
+            ].map(step => (
+              <View key={step.n} style={styles.step}>
+                <Text style={styles.stepNum}>{step.n}</Text>
+                <View style={styles.stepText}>
+                  <Text style={styles.stepTitle}>{step.title}</Text>
+                  <Text style={styles.stepDesc}>{step.desc}</Text>
+                </View>
+              </View>
+            ))}
           </View>
-        </TouchableOpacity>
+        </View>
 
         <TouchableOpacity style={styles.supportLink} onPress={() => router.push('/support')}>
           <Text style={styles.supportLinkText}>Служба поддержки</Text>
@@ -312,27 +307,24 @@ const styles = StyleSheet.create({
   wideDesc: { color: 'rgba(255,255,255,0.68)', fontSize: 13, lineHeight: 19, marginBottom: 12 },
   wideLink: { color: '#C9A84C', fontSize: 14, fontWeight: '700' },
 
-  // STUDIO CARD
-  studioCard: {
-    borderRadius: 20, overflow: 'hidden',
-    height: 180, marginBottom: 16,
-    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
+
+  // HOW IT WORKS
+  stepsCard: {
+    backgroundColor: '#111', borderRadius: 20, padding: 20,
+    marginBottom: 16, borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)',
   },
-  studioImage: { position: 'absolute', width: '100%', height: '100%' },
-  studioOverlay: {
-    position: 'absolute', width: '100%', height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.65)',
+  stepsTitle: {
+    color: '#fff', fontSize: 18, fontWeight: '800', marginBottom: 16,
   },
-  studioContent: {
-    flex: 1, padding: 20, justifyContent: 'center',
+  stepsList: { gap: 14 },
+  step: { flexDirection: 'row', alignItems: 'flex-start', gap: 14 },
+  stepNum: {
+    color: '#C9A84C', fontSize: 22, fontWeight: '900',
+    width: 36, lineHeight: 26,
   },
-  studioLabel: {
-    color: '#C9A84C', fontSize: 11, fontWeight: '700',
-    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
-  },
-  studioName: { color: '#fff', fontSize: 28, fontWeight: '900', marginBottom: 4 },
-  studioAddress: { color: 'rgba(255,255,255,0.55)', fontSize: 12, marginBottom: 8 },
-  studioLink: { color: '#C9A84C', fontSize: 13, fontWeight: '600' },
+  stepText: { flex: 1 },
+  stepTitle: { color: '#fff', fontSize: 15, fontWeight: '700', marginBottom: 2 },
+  stepDesc: { color: 'rgba(255,255,255,0.5)', fontSize: 13, lineHeight: 18 },
 
   // SUPPORT
   supportLink: { alignItems: 'center', paddingVertical: 16 },

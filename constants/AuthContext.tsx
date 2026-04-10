@@ -2,12 +2,13 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from './supabase'
 import type { User } from '@supabase/supabase-js'
 
-type Role = 'client' | 'studio_owner'
+type Role = 'client' | 'studio_owner' | 'admin'
 
 type Profile = {
   id: string
   role: Role
   display_name: string | null
+  studio_name: string | null
 }
 
 type AuthContextType = {
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function fetchProfile(userId: string) {
     const { data } = await supabase
       .from('profiles')
-      .select('id, role, display_name')
+      .select('id, role, display_name, studio_name')
       .eq('id', userId)
       .single()
     setProfile(data)
