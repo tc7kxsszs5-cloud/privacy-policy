@@ -12,6 +12,7 @@ import { createOrder } from '@/constants/orders-service'
 import { useAuth } from '@/constants/AuthContext'
 import { loadGlbDataUri } from '@/constants/car-glb-map'
 import { GlbKey } from '@/constants/glb-assets'
+import { supabase } from '@/constants/supabase'
 
 const DEMO_GLB = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb'
 
@@ -147,8 +148,28 @@ export default function EditorScreen() {
   }, [user, carId, partsConfig, windowsConfig, selectedStudioId, selectedStudioHashtag, router])
 
   const handleShare = useCallback(async () => {
-    await Share.share({ message: `CarWrap конфигурация машины — carwrap://editor/${carId}` })
-  }, [carId])
+    const partsArray = Object.entries(partsConfig).map(([part_id, v]) => ({ part_id, ...v }))
+    const windowsArray = Object.entries(windowsConfig).map(([window_id, v]) => ({ window_id, ...v }))
+
+    const { data, error } = await supabase
+      .from('shared_configurations')
+      .insert({
+        car_id: carId,
+        car_name: carName ?? '',
+        glb_key: glbKey ?? '',
+        parts_config: partsArray,
+        windows_config: windowsArray,
+      })
+      .select('id')
+      .single()
+
+    if (error || !data) {
+      Alert.alert('Ошибка', 'Не удалось создать ссылку')
+      return
+    }
+
+    await Share.share({ message: `Посмотри мою конфигурацию оклейки — carwrap://view/${data.id}` })
+  }, [carId, carName, partsConfig, windowsConfig])
 
   const partsCount = Object.keys(partsConfig).length
   const tintCount = Object.keys(windowsConfig).filter(k => windowsConfig[k].tintPercent > 0).length
@@ -202,6 +223,8 @@ export default function EditorScreen() {
         meshName={selectedMesh}
         onSelect={handleMaterialSelect}
         onClose={deselectMesh}
+        onOpen={() => viewerRef.current?.send({ type: 'studio_mode', enabled: true })}
+        onDismiss={() => viewerRef.current?.send({ type: 'studio_mode', enabled: false })}
       />
       <TintSheet
         ref={tintSheetRef}

@@ -28,6 +28,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
     import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 
     // ─── Renderer ────────────────────────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
@@ -43,6 +44,14 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     // ─── Scene ───────────────────────────────────────────────────────────────
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0x1a1a1a)
+
+    // ─── Environment map (reflections) ───────────────────────────────────────
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const roomEnv = new RoomEnvironment()
+    const envTexture = pmrem.fromScene(roomEnv, 0.04).texture
+    scene.environment = envTexture
+    roomEnv.dispose()
+    pmrem.dispose()
 
     // ─── Camera ──────────────────────────────────────────────────────────────
     const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.05, 100)
@@ -107,13 +116,22 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       'interior', 'seat', 'dashboard',
       'cabin', 'steering', 'brake',
       'carpet', 'trim_int', 'console',
+      // Helper/rig objects that appear as diamonds/octahedrons
+      'bone', 'helper', 'armature', 'ik', 'ctrl', 'target',
+      'pivot', 'null', 'empty', 'root', 'rig', 'joint',
+      'locator', 'dummy', 'gizmo', 'handle', 'control',
     ]
     function isProtected(name) {
       if (!name) return true
-      // Split by underscores and non-alphanumeric to avoid false positives
-      // e.g. "Recycled" must not match "led", "Saturn" must not match "turn"
       const tokens = name.toLowerCase().split(/[^a-z0-9]+/)
       return tokens.some(tok => PROTECTED.includes(tok))
+    }
+
+    // Filter out rig/helper geometry by vertex count — octahedron = 6 verts, box = 8
+    // Real car parts always have hundreds+ vertices
+    function isHelperGeometry(mesh) {
+      const count = mesh.geometry?.attributes?.position?.count ?? 0
+      return count > 0 && count <= 24  // any primitive with ≤24 verts is a helper shape
     }
 
     // Glass patterns → tint only
@@ -183,11 +201,13 @@ export const VIEWER_HTML = `<!DOCTYPE html>
             meshMaterials[key] = child.material.clone()
           }
 
-          // Register by name
+          // Register by name — skip protected and rig helper meshes
           if (child.name) {
             meshByName[child.name] = child
-            meshesArray.push(child)
-            if (!isProtected(child.name)) meshNames.push(child.name)
+            if (!isProtected(child.name) && !isHelperGeometry(child)) {
+              meshesArray.push(child)
+              meshNames.push(child.name)
+            }
           }
         })
 
@@ -202,20 +222,88 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       })
     }
 
-    // ─── Material presets ────────────────────────────────────────────────────
-    const ROUGHNESS = { gloss: 0.05, matte: 0.85, carbon: 0.35, chrome: 0.0, satin: 0.45 }
-    const METALNESS = { gloss: 0.15, matte: 0.0,  carbon: 0.4,  chrome: 1.0, satin: 0.2  }
+    // ─── Material presets — physically based values ──────────────────────────
+    //
+    //  finish   roughness  metalness  clearcoat  cc_rough   notes
+    //  ───────  ─────────  ─────────  ─────────  ────────   ─────────────────────────────────────────
+    //  gloss    0.04       0.1        0.95       0.05       automotive gloss paint — near-mirror lacquer
+    //  matte    0.92       0.0        0.0        0.0        matte film — fully diffuse, no specular
+    //  satin    0.40       0.1        0.25       0.25       semi-gloss, soft sheen, slight lacquer layer
+    //  pearl    0.20       0.05       0.55       0.08       semi-gloss with iridescent sheen layer
+    //  carbon   0.35       0.55       0.65       0.12       woven fibre — moderate metallic, strong lacquer
+    //  chrome   0.0        1.0        0.0        0.0        mirror chrome — pure metallic, no lacquer
+    //
+    const ROUGHNESS  = { gloss: 0.04,  matte: 0.92, satin: 0.40, pearl: 0.20, carbon: 0.35, chrome: 0.0  }
+    const METALNESS  = { gloss: 0.10,  matte: 0.0,  satin: 0.10, pearl: 0.05, carbon: 0.55, chrome: 1.0  }
+    const CLEARCOAT  = { gloss: 0.95,  matte: 0.0,  satin: 0.25, pearl: 0.55, carbon: 0.65, chrome: 0.0  }
+    const CLEARCOAT_R= { gloss: 0.05,  matte: 0.0,  satin: 0.25, pearl: 0.08, carbon: 0.12, chrome: 0.0  }
 
     function applyMaterial(meshName, colorHex, finish) {
       if (!carModel || !meshName || isProtected(meshName) || isGlass(meshName)) return
       const mesh = meshByName[meshName]
-      if (!mesh) return
+      if (!mesh || isHelperGeometry(mesh)) return
 
-      const mat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(colorHex),
-        roughness: ROUGHNESS[finish] ?? 0.5,
-        metalness: METALNESS[finish] ?? 0.1,
-        envMapIntensity: finish === 'chrome' ? 2.5 : 1.0,
+      const color = new THREE.Color(colorHex)
+
+      // Carbon: procedural woven pattern via onBeforeCompile
+      if (finish === 'carbon') {
+        const mat = new THREE.MeshPhysicalMaterial({
+          color,
+          roughness: 0.4,
+          metalness: 0.5,
+          clearcoat: 0.6,
+          clearcoatRoughness: 0.1,
+          envMapIntensity: 1.2,
+        })
+        mat.onBeforeCompile = (shader) => {
+          // Use world position — always available, no UV needed
+          shader.vertexShader = shader.vertexShader.replace(
+            '#include <worldpos_vertex>',
+            `#include <worldpos_vertex>
+            vWorldPos = worldPosition.xyz;`
+          )
+          shader.vertexShader = 'varying vec3 vWorldPos;\n' + shader.vertexShader
+          shader.fragmentShader = 'varying vec3 vWorldPos;\n' + shader.fragmentShader
+          shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <color_fragment>',
+            `#include <color_fragment>
+            vec2 wp = vWorldPos.xz * 18.0;
+            vec2 cell = floor(wp);
+            vec2 f = fract(wp);
+            float angle = mod(cell.x + cell.y, 2.0) * 0.7854;
+            float s = sin(angle), c2 = cos(angle);
+            vec2 rot = vec2(c2*(f.x-0.5) - s*(f.y-0.5), s*(f.x-0.5) + c2*(f.y-0.5));
+            float fiber = smoothstep(0.28, 0.34, abs(rot.x)) * 0.4;
+            diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.35, fiber);`
+          )
+        }
+        if (highlightedMesh === mesh) {
+          mat.emissive = new THREE.Color(0xC9A84C)
+          mat.emissiveIntensity = 0.5
+          highlightSavedEmissive = new THREE.Color(0x000000)
+        }
+        mesh.material = mat
+        return
+      }
+
+      const mat = new THREE.MeshPhysicalMaterial({
+        color,
+        roughness:          ROUGHNESS[finish]   ?? 0.5,
+        metalness:          METALNESS[finish]   ?? 0.1,
+        clearcoat:          CLEARCOAT[finish]   ?? 0.0,
+        clearcoatRoughness: CLEARCOAT_R[finish] ?? 0.1,
+        envMapIntensity:    finish === 'chrome' ? 3.5 : 1.6,
+        // Pearl: iridescent thin-film interference (mica flakes in paint)
+        sheen:                    finish === 'pearl'  ? 0.5  : 0.0,
+        sheenRoughness:           finish === 'pearl'  ? 0.4  : 1.0,
+        sheenColor:               finish === 'pearl'  ? new THREE.Color(colorHex).offsetHSL(0.08, 0.3, 0.12) : new THREE.Color(0),
+        iridescence:              finish === 'pearl'  ? 0.75 : 0.0,
+        iridescenceIOR:           finish === 'pearl'  ? 1.56 : 1.3,   // mica IOR ≈ 1.56
+        iridescenceThicknessRange:finish === 'pearl'  ? [180, 520]   // nm — full rainbow sweep
+                                                      : [100, 400],
+        // Chrome: high IOR for mirror-like surface
+        ior:                finish === 'chrome' ? 2.5  : 1.5,
+        reflectivity:       finish === 'chrome' ? 1.0  : 0.5,
       })
 
       // If this mesh is highlighted, carry over emissive
@@ -264,6 +352,27 @@ export const VIEWER_HTML = `<!DOCTYPE html>
         mesh.material.emissive = new THREE.Color(0xC9A84C)
         mesh.material.emissiveIntensity = 0.22
         highlightedMesh = mesh
+      }
+    }
+
+    // ─── Studio mode (bright neutral lighting for palette selection) ─────────
+    function setStudioMode(enabled) {
+      if (enabled) {
+        scene.background = new THREE.Color(0xf0f0f0)
+        ambientLight.intensity = 3.5
+        keyLight.intensity = 4.0
+        fillLight.intensity = 3.0
+        rimLight.intensity = 2.5
+        topLight.intensity = 2.0
+        renderer.toneMappingExposure = 1.8
+      } else {
+        scene.background = new THREE.Color(0x1a1a1a)
+        ambientLight.intensity = 1.8
+        keyLight.intensity = 2.8
+        fillLight.intensity = 1.6
+        rimLight.intensity = 1.4
+        topLight.intensity = 1.0
+        renderer.toneMappingExposure = 1.3
       }
     }
 
@@ -360,6 +469,7 @@ export const VIEWER_HTML = `<!DOCTYPE html>
       else if (msg.type === 'apply_tint')     applyTint(msg.meshName, msg.tintPercent)
       else if (msg.type === 'reset_all')      resetAll()
       else if (msg.type === 'highlight_mesh') highlightMesh(msg.meshName)
+      else if (msg.type === 'studio_mode')    setStudioMode(msg.enabled)
     })
 
     // ─── Resize ───────────────────────────────────────────────────────────────

@@ -7,6 +7,7 @@ export type RNtoWebView =
   | { type: 'apply_tint'; meshName: string; tintPercent: number }
   | { type: 'reset_all' }
   | { type: 'highlight_mesh'; meshName: string | null }
+  | { type: 'studio_mode'; enabled: boolean }
 
 // Messages sent FROM WebView TO React Native
 export type WebViewToRN =
@@ -15,7 +16,7 @@ export type WebViewToRN =
   | { type: 'model_loaded'; meshNames: string[] }
   | { type: 'model_error'; message: string }
 
-export type MaterialFinish = 'gloss' | 'matte' | 'carbon' | 'chrome' | 'satin'
+export type MaterialFinish = 'gloss' | 'matte' | 'carbon' | 'chrome' | 'satin' | 'pearl'
 
 export function postToWebView(ref: React.RefObject<any>, msg: RNtoWebView) {
   ref.current?.injectJavaScript(`
