@@ -257,24 +257,24 @@ export const VIEWER_HTML = `<!DOCTYPE html>
         })
         mat.onBeforeCompile = (shader) => {
           // Use world position — always available, no UV needed
+          const inc = '#include'
           shader.vertexShader = shader.vertexShader.replace(
-            '#include <worldpos_vertex>',
-            `#include <worldpos_vertex>
-            vWorldPos = worldPosition.xyz;`
+            inc + ' <worldpos_vertex>',
+            inc + ' <worldpos_vertex>\n            vWorldPos = worldPosition.xyz;'
           )
           shader.vertexShader = 'varying vec3 vWorldPos;\n' + shader.vertexShader
           shader.fragmentShader = 'varying vec3 vWorldPos;\n' + shader.fragmentShader
           shader.fragmentShader = shader.fragmentShader.replace(
-            '#include <color_fragment>',
-            `#include <color_fragment>
-            vec2 wp = vWorldPos.xz * 18.0;
-            vec2 cell = floor(wp);
-            vec2 f = fract(wp);
-            float angle = mod(cell.x + cell.y, 2.0) * 0.7854;
-            float s = sin(angle), c2 = cos(angle);
-            vec2 rot = vec2(c2*(f.x-0.5) - s*(f.y-0.5), s*(f.x-0.5) + c2*(f.y-0.5));
-            float fiber = smoothstep(0.28, 0.34, abs(rot.x)) * 0.4;
-            diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.35, fiber);`
+            inc + ' <color_fragment>',
+            inc + ' <color_fragment>\n' +
+            '            vec2 wp = vWorldPos.xz * 18.0;\n' +
+            '            vec2 cell = floor(wp);\n' +
+            '            vec2 f = fract(wp);\n' +
+            '            float angle = mod(cell.x + cell.y, 2.0) * 0.7854;\n' +
+            '            float s = sin(angle), c2 = cos(angle);\n' +
+            '            vec2 rot = vec2(c2*(f.x-0.5) - s*(f.y-0.5), s*(f.x-0.5) + c2*(f.y-0.5));\n' +
+            '            float fiber = smoothstep(0.28, 0.34, abs(rot.x)) * 0.4;\n' +
+            '            diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.35, fiber);'
           )
         }
         if (highlightedMesh === mesh) {
