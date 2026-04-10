@@ -30,7 +30,7 @@ export const CarViewer = forwardRef<CarViewerHandle, Props>(({ onMessage }, ref)
     <View style={styles.container}>
       <WebView
         ref={webViewRef}
-        source={{ html: VIEWER_HTML }}
+        source={{ html: VIEWER_HTML, baseUrl: 'https://cdn.jsdelivr.net' }}
         style={styles.webview}
         onMessage={handleMessage}
         javaScriptEnabled
@@ -38,6 +38,8 @@ export const CarViewer = forwardRef<CarViewerHandle, Props>(({ onMessage }, ref)
         mediaPlaybackRequiresUserAction={false}
         originWhitelist={['*']}
         mixedContentMode="always"
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
       />
     </View>
   )
