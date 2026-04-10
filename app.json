@@ -2,7 +2,7 @@
   "expo": {
     "name": "Detailing Time",
     "slug": "carwrap",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "scheme": "detailingtime",
     "icon": "./assets/icon.png",
     "splash": {
@@ -25,7 +25,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.kiku79.detailingtime",
-      "buildNumber": "17",
+      "buildNumber": "30",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
