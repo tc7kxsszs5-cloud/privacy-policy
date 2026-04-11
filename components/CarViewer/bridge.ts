@@ -3,6 +3,9 @@
 // Messages sent FROM React Native TO WebView
 export type RNtoWebView =
   | { type: 'load_model'; glbUrl: string }
+  | { type: 'load_model_chunk_start'; totalChunks: number }
+  | { type: 'load_model_chunk'; index: number; data: string }
+  | { type: 'load_model_chunk_end' }
   | { type: 'apply_material'; meshName: string; colorHex: string; finish: MaterialFinish }
   | { type: 'apply_tint'; meshName: string; tintPercent: number }
   | { type: 'reset_all' }

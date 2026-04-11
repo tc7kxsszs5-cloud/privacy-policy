@@ -10,7 +10,7 @@ import { useEditorStore } from '@/constants/editor-store'
 import { WebViewToRN } from '@/components/CarViewer/bridge'
 import { createOrder } from '@/constants/orders-service'
 import { useAuth } from '@/constants/AuthContext'
-import { loadGlbDataUri } from '@/constants/car-glb-map'
+import { sendGlbChunked } from '@/constants/car-glb-map'
 import { GlbKey } from '@/constants/glb-assets'
 import { supabase } from '@/constants/supabase'
 
@@ -31,30 +31,31 @@ export default function EditorScreen() {
     setCarId, selectMesh, applyMaterial, applyTint, resetAll,
   } = useEditorStore()
 
-  const [modelUrl, setModelUrl] = useState(glbUrl || DEMO_GLB)
+  const [modelUrl] = useState(glbUrl || DEMO_GLB)
   const viewerReadyRef = useRef(false)
-  const pendingUrlRef = useRef<string | null>(null)
+  const pendingKeyRef = useRef<GlbKey | null>(null)
 
   useEffect(() => {
     setCarId(carId, modelUrl)
     if (glbKey) {
-      loadGlbDataUri(glbKey as GlbKey).then(dataUri => {
-        if (viewerReadyRef.current) {
-          viewerRef.current?.send({ type: 'load_model', glbUrl: dataUri })
-        } else {
-          pendingUrlRef.current = dataUri
-        }
-        setModelUrl(dataUri)
-      }).catch(() => {})
+      if (viewerReadyRef.current) {
+        sendGlbChunked(glbKey as GlbKey, (msg) => viewerRef.current?.send(msg)).catch(() => {})
+      } else {
+        pendingKeyRef.current = glbKey as GlbKey
+      }
     }
   }, [carId])
 
   const handleViewerMessage = useCallback((msg: WebViewToRN) => {
     if (msg.type === 'ready') {
       viewerReadyRef.current = true
-      const url = pendingUrlRef.current ?? modelUrl
-      viewerRef.current?.send({ type: 'load_model', glbUrl: url })
-      pendingUrlRef.current = null
+      const key = pendingKeyRef.current
+      if (key) {
+        pendingKeyRef.current = null
+        sendGlbChunked(key, (m) => viewerRef.current?.send(m)).catch(() => {})
+      } else {
+        viewerRef.current?.send({ type: 'load_model', glbUrl: modelUrl })
+      }
       return
     }
     if (msg.type === 'model_loaded') {

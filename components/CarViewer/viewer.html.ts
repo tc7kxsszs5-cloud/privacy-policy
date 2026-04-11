@@ -151,6 +151,10 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     let highlightSavedEmissive = null
     let highlightSavedIntensity = 0
 
+    // ─── Chunk transfer state ─────────────────────────────────────────────
+    let _chunks = null
+    let _chunkTotal = 0
+
     // ─── Loaders ─────────────────────────────────────────────────────────────
     const dracoLoader = new DRACOLoader()
     dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/libs/draco/')
@@ -464,7 +468,16 @@ export const VIEWER_HTML = `<!DOCTYPE html>
     window.addEventListener('message', e => {
       let msg
       try { msg = JSON.parse(e.data) } catch { return }
-      if      (msg.type === 'load_model')     loadModel(msg.glbUrl)
+      if      (msg.type === 'load_model')             loadModel(msg.glbUrl)
+      else if (msg.type === 'load_model_chunk_start') { _chunks = []; _chunkTotal = msg.totalChunks }
+      else if (msg.type === 'load_model_chunk')       { if (_chunks) _chunks[msg.index] = msg.data }
+      else if (msg.type === 'load_model_chunk_end')   {
+        if (_chunks && _chunks.length === _chunkTotal) {
+          const url = 'data:model/gltf-binary;base64,' + _chunks.join('')
+          _chunks = null; _chunkTotal = 0
+          loadModel(url)
+        }
+      }
       else if (msg.type === 'apply_material') applyMaterial(msg.meshName, msg.colorHex, msg.finish)
       else if (msg.type === 'apply_tint')     applyTint(msg.meshName, msg.tintPercent)
       else if (msg.type === 'reset_all')      resetAll()

@@ -1,6 +1,9 @@
 import { Asset } from 'expo-asset'
 import { readAsStringAsync } from 'expo-file-system/legacy'
 import { GLB_ASSETS, GlbKey } from './glb-assets'
+import type { RNtoWebView } from '@/components/CarViewer/bridge'
+
+const CHUNK_SIZE = 1_000_000  // 1MB per chunk — safe limit for WKWebView injectJavaScript
 
 // Exact model names from Supabase → GLB key
 const MAPPING: Array<{ key: GlbKey; make: string; models: string[] }> = [
@@ -57,4 +60,19 @@ export async function loadGlbDataUri(key: GlbKey): Promise<string> {
   await asset.downloadAsync()
   const base64 = await readAsStringAsync(asset.localUri!, { encoding: 'base64' })
   return `data:model/gltf-binary;base64,${base64}`
+}
+
+export async function sendGlbChunked(
+  key: GlbKey,
+  send: (msg: RNtoWebView) => void
+): Promise<void> {
+  const asset = Asset.fromModule(GLB_ASSETS[key])
+  await asset.downloadAsync()
+  const base64 = await readAsStringAsync(asset.localUri!, { encoding: 'base64' })
+  const total = Math.ceil(base64.length / CHUNK_SIZE)
+  send({ type: 'load_model_chunk_start', totalChunks: total })
+  for (let i = 0; i < total; i++) {
+    send({ type: 'load_model_chunk', index: i, data: base64.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE) })
+  }
+  send({ type: 'load_model_chunk_end' })
 }
