@@ -3,6 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": { "@/*": ["./*"] },
-    "lib": ["ES2020", "DOM"]
+    "lib": ["ES2020", "DOM"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   }
 }
