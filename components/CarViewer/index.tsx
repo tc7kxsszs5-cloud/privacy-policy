@@ -1,7 +1,7 @@
 import { useRef, forwardRef, useImperativeHandle } from 'react'
 import { StyleSheet, View } from 'react-native'
 import WebView from 'react-native-webview'
-import { VIEWER_HTML } from './viewer.html.ts'
+import { VIEWER_HTML } from './viewer.html'
 import { postToWebView, RNtoWebView, WebViewToRN } from './bridge'
 
 export type CarViewerHandle = {

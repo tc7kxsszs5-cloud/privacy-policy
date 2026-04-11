@@ -41,6 +41,10 @@ const MAPPING: Array<{ key: GlbKey; make: string; models: string[] }> = [
   { key: 'rolls_royce_boattail',             make: 'Rolls-Royce',   models: ['Boat Tail'] },
   { key: 'porsche_cayenne_turbo_gt_2022',    make: 'Porsche',       models: ['Cayenne Turbo GT'] },
   { key: 'mercedes_g_class',                make: 'Mercedes-Benz', models: ['G-Класс', 'G-Класс AMG', 'G-Класс AMG 6x6', 'Maybach G 650 Landaulet'] },
+  { key: 'volvo_xc90',  make: 'Volvo', models: ['XC90', 'XC90 Recharge', 'EX90', 'XC70'] },
+  { key: 'volvo_xc60',  make: 'Volvo', models: ['XC60', 'XC60 Recharge', 'EX60', 'XC40', 'EX40', 'EX30', 'EX30 Cross Country'] },
+  { key: 'volvo_s90',   make: 'Volvo', models: ['S90', 'S90 Recharge', 'ES90', 'S60', 'S60 Cross Country', 'V90', 'V90 Cross Country', 'V60', 'V60 Cross Country', 'V40', 'V40 Cross Country'] },
+  { key: 'volvo_c40',   make: 'Volvo', models: ['C40 Recharge', 'C40', 'EC40', 'EM90'] },
 ]
 
 export function getGlbKey(make: string, model: string): GlbKey | null {

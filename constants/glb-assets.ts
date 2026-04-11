@@ -37,6 +37,10 @@ export const GLB_ASSETS = {
   rolls_royce_boattail:             require('../assets/models/cars/rolls_royce_boattail.glb'),
   porsche_cayenne_turbo_gt_2022:    require('../assets/models/cars/porsche_cayenne_turbo_gt_2022.glb'),
   mercedes_g_class:                 require('../assets/models/cars/mercedes_g_class.glb'),
+  volvo_xc90:                       require('../assets/models/cars/volvo_xc90.glb'),
+  volvo_xc60:                       require('../assets/models/cars/volvo_xc60.glb'),
+  volvo_s90:                        require('../assets/models/cars/volvo_s90.glb'),
+  volvo_c40:                        require('../assets/models/cars/volvo_c40.glb'),
 } as const
 
 export type GlbKey = keyof typeof GLB_ASSETS

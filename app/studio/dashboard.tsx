@@ -28,11 +28,13 @@ export default function StudioDashboard() {
 
   useEffect(() => {
     if (!user || profile?.role !== 'studio_owner') { setLoading(false); return }
-    supabase
-      .from('studio_profiles')
-      .select('id')
-      .limit(1)
-      .single()
+    Promise.resolve(
+      supabase
+        .from('studio_profiles')
+        .select('id')
+        .limit(1)
+        .single()
+    )
       .then(({ data: studio }) => {
         if (studio?.id) return getStudioOrders(studio.id)
         return []
