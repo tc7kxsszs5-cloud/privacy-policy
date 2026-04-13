@@ -1,0 +1,8 @@
+.git
+.expo
+.claude/
+node_modules/.cache
+mempalace.yaml
+entities.json
+Library/
+scripts/

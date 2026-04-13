@@ -1,0 +1,55 @@
+wing: carwrap
+rooms:
+- name: app
+  description: Files from app/
+  keywords:
+  - app
+  - app
+- name: web
+  description: Files from web/
+  keywords:
+  - web
+  - web
+- name: constants
+  description: Files from constants/
+  keywords:
+  - constants
+  - constants
+- name: backend
+  description: Files from backend/
+  keywords:
+  - backend
+  - backend
+- name: documentation
+  description: Files from docs/
+  keywords:
+  - documentation
+  - docs
+- name: ios
+  description: Files from ios/
+  keywords:
+  - ios
+  - ios
+- name: supabase
+  description: Files from supabase/
+  keywords:
+  - supabase
+  - supabase
+- name: frontend
+  description: Files from components/
+  keywords:
+  - frontend
+  - components
+- name: scripts
+  description: Files from scripts/
+  keywords:
+  - scripts
+  - scripts
+- name: design
+  description: Files from assets/
+  keywords:
+  - design
+  - assets
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []

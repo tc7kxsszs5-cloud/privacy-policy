@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>3D Test</title>
+<style>
+body { margin: 0; background: #000; font-family: monospace; }
+#log { color: #0f0; padding: 20px; font-size: 16px; line-height: 2; }
+</style>
+</head>
+<body>
+<div id="log">STEP 1: Page loaded OK<br></div>
+<script>
+function log(msg) {
+  document.getElementById('log').innerHTML += msg + '<br>';
+  fetch('/log?msg=' + encodeURIComponent(msg));
+}
+log('STEP 2: JS running');
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.min.js"
+  onload="log('STEP 3: THREE loaded OK, rev=' + THREE.REVISION)"
+  onerror="log('STEP 3 FAIL: THREE not loaded - no internet?')">
+</script>
+<script>
+setTimeout(function() {
+  if (typeof THREE === 'undefined') {
+    log('STEP 3 FAIL: THREE undefined after 3s');
+    return;
+  }
+  try {
+    var r = new THREE.WebGLRenderer();
+    log('STEP 4: WebGL OK');
+    r.domElement.remove();
+  } catch(e) {
+    log('STEP 4 FAIL: WebGL error - ' + e.message);
+  }
+
+  var loader = new THREE.GLTFLoader ? new THREE.GLTFLoader() : null;
+  if (!loader) { log('STEP 5 FAIL: GLTFLoader not found'); return; }
+  log('STEP 5: GLTFLoader OK');
+  log('STEP 6: Loading GLB from internet...');
+  loader.load(
+    'https://threejs.org/examples/models/gltf/Duck/glTF-Binary/Duck.glb',
+    function(g) { log('STEP 7: GLB loaded! 3D viewer WORKS'); },
+    null,
+    function(e) { log('STEP 7 FAIL: ' + e.message); }
+  );
+}, 3000);
+</script>
+</body>
+</html>
