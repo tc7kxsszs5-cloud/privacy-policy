@@ -3831,6 +3831,7 @@ three/build/three.module.js:
     const THREE = ThreeBundle.THREE
     const GLTFLoader = ThreeBundle.GLTFLoader
     const OrbitControls = ThreeBundle.OrbitControls
+    const DRACOLoader = ThreeBundle.DRACOLoader
 
     // ─── Renderer ────────────────────────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
@@ -3943,12 +3944,46 @@ three/build/three.module.js:
 
     let _chunks = null
     let _chunkTotal = 0
+    let currentObjectUrl = null
+
+    function debugLog(message) {
+      sendToRN({ type: 'debug_log', message })
+    }
+
+    function revokeCurrentObjectUrl() {
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl)
+        currentObjectUrl = null
+      }
+    }
+
+    function createGlbObjectUrlFromBase64Chunks(chunks) {
+      let totalLength = 0
+      const byteChunks = chunks.map((chunk) => {
+        const binary = atob(chunk)
+        const bytes = new Uint8Array(binary.length)
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i)
+        }
+        totalLength += bytes.length
+        return bytes
+      })
+
+      const blob = new Blob(byteChunks, { type: 'model/gltf-binary' })
+      debugLog('chunk:blob bytes=' + totalLength)
+      return URL.createObjectURL(blob)
+    }
 
     // ─── Loaders ─────────────────────────────────────────────────────────────
+    const dracoLoader = new DRACOLoader()
+    dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/libs/draco/')
     const gltfLoader = new GLTFLoader()
+    gltfLoader.setDRACOLoader(dracoLoader)
 
     // ─── Load model ──────────────────────────────────────────────────────────
-    function loadModel(url) {
+    function loadModel(url, isObjectUrl) {
+      debugLog('loadModel:start urlPrefix=' + String(url).slice(0, 32))
+      if (!isObjectUrl) revokeCurrentObjectUrl()
       if (carModel) { scene.remove(carModel); carModel = null }
       Object.keys(meshMaterials).forEach(k => delete meshMaterials[k])
       Object.keys(meshByName).forEach(k => delete meshByName[k])
@@ -3998,11 +4033,19 @@ three/build/three.module.js:
 
         scene.add(carModel)
         document.getElementById('loading').style.display = 'none'
+        debugLog('loadModel:success meshes=' + meshNames.length)
+        if (isObjectUrl) {
+          revokeCurrentObjectUrl()
+        }
         sendToRN({ type: 'model_loaded', meshNames })
       },
       undefined,
       (err) => {
         document.getElementById('loading').textContent = 'Ошибка загрузки'
+        debugLog('loadModel:error ' + (err && err.message ? err.message : 'load failed'))
+        if (isObjectUrl) {
+          revokeCurrentObjectUrl()
+        }
         sendToRN({ type: 'model_error', message: err.message || 'load failed' })
       })
     }
@@ -4200,17 +4243,54 @@ three/build/three.module.js:
       }
     }
 
-    window.addEventListener('message', e => {
+    function handleBridgeMessage(data) {
       let msg
-      try { msg = JSON.parse(e.data) } catch { return }
-      if      (msg.type === 'load_model')             loadModel(msg.glbUrl)
-      else if (msg.type === 'load_model_chunk_start') { _chunks = []; _chunkTotal = msg.totalChunks }
-      else if (msg.type === 'load_model_chunk')       { if (_chunks) _chunks[msg.index] = msg.data }
-      else if (msg.type === 'load_model_chunk_end')   {
-        if (_chunks && _chunks.length === _chunkTotal) {
-          const url = 'data:model/gltf-binary;base64,' + _chunks.join('')
-          _chunks = null; _chunkTotal = 0
-          loadModel(url)
+      try { msg = typeof data === 'string' ? JSON.parse(data) : data } catch { return }
+      if      (msg.type === 'load_model') {
+        debugLog('message:load_model')
+        loadModel(msg.glbUrl)
+      }
+      else if (msg.type === 'load_model_chunk_start') {
+        _chunks = []; _chunkTotal = msg.totalChunks
+        document.getElementById('loading').textContent = 'Получение модели 0/' + msg.totalChunks
+        debugLog('chunk:start total=' + msg.totalChunks)
+      }
+      else if (msg.type === 'load_model_chunk') {
+        if (_chunks) {
+          _chunks[msg.index] = msg.data
+          let received = 0
+          for (let i = 0; i < _chunks.length; i++) {
+            if (_chunks[i]) received++
+          }
+          document.getElementById('loading').textContent = 'Получение модели ' + received + '/' + _chunkTotal
+          if (received === 1 || received === _chunkTotal || received % 25 === 0) {
+            debugLog('chunk:progress ' + received + '/' + _chunkTotal)
+          }
+        }
+      }
+      else if (msg.type === 'load_model_chunk_end') {
+        if (_chunks) {
+          document.getElementById('loading').textContent = 'Сборка модели...'
+          try {
+            const hasAllChunks = _chunks.length === _chunkTotal && _chunks.every(Boolean)
+            if (!hasAllChunks) throw new Error('missing chunks')
+            debugLog('chunk:end blobStart total=' + _chunkTotal)
+            revokeCurrentObjectUrl()
+            const url = createGlbObjectUrlFromBase64Chunks(_chunks)
+            currentObjectUrl = url
+            _chunks = null
+            _chunkTotal = 0
+            debugLog('chunk:end blobDone')
+            loadModel(url, true)
+          } catch(e) {
+            document.getElementById('loading').textContent = 'Ошибка сборки: ' + e.message
+            debugLog('chunk:error ' + (e && e.message ? e.message : 'chunk assembly failed'))
+            sendToRN({ type: 'model_error', message: e.message || 'chunk assembly failed' })
+          }
+        } else {
+          document.getElementById('loading').textContent = 'Ошибка сборки'
+          debugLog('chunk:error missing chunk state')
+          sendToRN({ type: 'model_error', message: 'chunk assembly failed' })
         }
       }
       else if (msg.type === 'apply_material') applyMaterial(msg.meshName, msg.colorHex, msg.finish)
@@ -4218,6 +4298,14 @@ three/build/three.module.js:
       else if (msg.type === 'reset_all')      resetAll()
       else if (msg.type === 'highlight_mesh') highlightMesh(msg.meshName)
       else if (msg.type === 'studio_mode')    setStudioMode(msg.enabled)
+    }
+
+    window.__CARWRAP_RECEIVE__ = handleBridgeMessage
+    window.addEventListener('message', e => {
+      handleBridgeMessage(e.data)
+    })
+    document.addEventListener('message', e => {
+      handleBridgeMessage(e.data)
     })
 
     // ─── Resize ──────────────────────────────────────────────────────────────
@@ -4235,6 +4323,7 @@ three/build/three.module.js:
     }
     animate()
 
+    debugLog('viewer:ready')
     sendToRN({ type: 'ready' })
     })()
   </script>

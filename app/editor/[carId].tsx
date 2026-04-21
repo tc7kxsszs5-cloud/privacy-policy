@@ -48,17 +48,25 @@ export default function EditorScreen() {
 
   const handleViewerMessage = useCallback((msg: WebViewToRN) => {
     if (msg.type === 'ready') {
+      console.log('[CarViewer]', 'ready')
       viewerReadyRef.current = true
       const key = pendingKeyRef.current
       if (key) {
+        console.log('[CarViewer]', 'sending chunked model', key)
         pendingKeyRef.current = null
         sendGlbChunked(key, (m) => viewerRef.current?.send(m)).catch(() => {})
       } else {
+        console.log('[CarViewer]', 'sending remote model url')
         viewerRef.current?.send({ type: 'load_model', glbUrl: modelUrl })
       }
       return
     }
+    if (msg.type === 'debug_log') {
+      console.log('[CarViewer][debug]', msg.message)
+      return
+    }
     if (msg.type === 'model_loaded') {
+      console.log('[CarViewer]', 'model_loaded meshes=', msg.meshNames.length)
       const { partsConfig, windowsConfig } = useEditorStore.getState()
       Object.entries(partsConfig).forEach(([meshName, { colorHex, finish }]) => {
         viewerRef.current?.send({ type: 'apply_material', meshName, colorHex, finish })
@@ -77,7 +85,8 @@ export default function EditorScreen() {
         materialSheetRef.current?.expand()
       }
     } else if (msg.type === 'model_error') {
-      Alert.alert('Ошибка', 'Не удалось загрузить модель')
+      console.log('[CarViewer]', 'model_error', msg.message)
+      Alert.alert('Ошибка', `Не удалось загрузить модель\n\n${msg.message}`)
     }
   }, [selectMesh])
 

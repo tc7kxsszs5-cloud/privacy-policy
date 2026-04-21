@@ -26,7 +26,10 @@ export default function CatalogScreen() {
         keyExtractor={b => b.name}
         renderItem={({ item }) => (
           <BrandCard brand={item.name} count={item.count}
-            onPress={() => router.push(`/catalog/${item.name}`)} />
+            onPress={() => router.push({
+              pathname: '/catalog/[brand]',
+              params: { brand: item.name },
+            } as any)} />
         )}
       />
     </View>

@@ -3,7 +3,14 @@ import { readAsStringAsync } from 'expo-file-system/legacy'
 import { GLB_ASSETS, GlbKey } from './glb-assets'
 import type { RNtoWebView } from '@/components/CarViewer/bridge'
 
-const CHUNK_SIZE = 1_000_000  // 1MB per chunk — safe limit for WKWebView injectJavaScript
+// WKWebView becomes unreliable when we inject very large JS payloads back-to-back.
+// Smaller chunks plus brief yields keep TestFlight/iPhone builds from stalling on loader.
+const CHUNK_SIZE = 128_000
+const CHUNKS_PER_BATCH = 4
+
+function yieldToWebView(): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, 0))
+}
 
 // Exact model names from Supabase → GLB key
 const MAPPING: Array<{ key: GlbKey; make: string; models: string[] }> = [
@@ -73,6 +80,10 @@ export async function sendGlbChunked(
   send({ type: 'load_model_chunk_start', totalChunks: total })
   for (let i = 0; i < total; i++) {
     send({ type: 'load_model_chunk', index: i, data: base64.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE) })
+    if ((i + 1) % CHUNKS_PER_BATCH === 0) {
+      await yieldToWebView()
+    }
   }
+  await yieldToWebView()
   send({ type: 'load_model_chunk_end' })
 }

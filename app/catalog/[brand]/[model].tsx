@@ -22,11 +22,14 @@ export default function GenerationsScreen() {
 
   const handlePress = (item: Car) => {
     const glbKey = getGlbKey(brand, model)
-    const params = new URLSearchParams({
-      ...(glbKey ? { glbKey } : item.glb_url ? { glbUrl: item.glb_url } : {}),
-      carName: `${brand} ${model}`,
-    })
-    router.push(`/editor/${item.id}?${params.toString()}`)
+    router.push({
+      pathname: '/editor/[carId]',
+      params: {
+        carId: item.id,
+        ...(glbKey ? { glbKey } : item.glb_url ? { glbUrl: item.glb_url } : {}),
+        carName: `${brand} ${model}`,
+      },
+    } as any)
   }
 
   if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#C9A84C" />

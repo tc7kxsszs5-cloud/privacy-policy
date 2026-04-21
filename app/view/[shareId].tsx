@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { CarViewer, CarViewerHandle } from '@/components/CarViewer'
 import { WebViewToRN } from '@/components/CarViewer/bridge'
 import { supabase } from '@/constants/supabase'
-import { loadGlbDataUri } from '@/constants/car-glb-map'
+import { sendGlbChunked } from '@/constants/car-glb-map'
 import { GlbKey } from '@/constants/glb-assets'
 
 type SharedConfig = {
@@ -23,10 +23,18 @@ export default function ViewScreen() {
   const viewerRef = useRef<CarViewerHandle>(null)
   const viewerReadyRef = useRef(false)
   const pendingConfigRef = useRef<SharedConfig | null>(null)
-  const modelUrlRef = useRef(DEMO_GLB)
 
   const [config, setConfig] = useState<SharedConfig | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const loadSharedModel = useCallback((cfg: SharedConfig | null) => {
+    if (cfg?.glb_key) {
+      sendGlbChunked(cfg.glb_key as GlbKey, (msg) => viewerRef.current?.send(msg))
+        .catch(() => viewerRef.current?.send({ type: 'load_model', glbUrl: DEMO_GLB }))
+      return
+    }
+    viewerRef.current?.send({ type: 'load_model', glbUrl: DEMO_GLB })
+  }, [])
 
   useEffect(() => {
     supabase
@@ -45,30 +53,21 @@ export default function ViewScreen() {
         setConfig(cfg)
         setLoading(false)
 
-        if (cfg.glb_key) {
-          try {
-            const dataUri = await loadGlbDataUri(cfg.glb_key as GlbKey)
-            modelUrlRef.current = dataUri
-          } catch {}
-        }
-
         if (viewerReadyRef.current) {
-          viewerRef.current?.send({ type: 'load_model', glbUrl: modelUrlRef.current })
+          loadSharedModel(cfg)
         } else {
           pendingConfigRef.current = cfg
         }
       })
-  }, [shareId])
+  }, [shareId, loadSharedModel])
 
   const handleViewerMessage = useCallback((msg: WebViewToRN) => {
     if (msg.type === 'ready') {
       viewerReadyRef.current = true
-      viewerRef.current?.send({ type: 'load_model', glbUrl: modelUrlRef.current })
-      if (pendingConfigRef.current) {
-        pendingConfigRef.current = pendingConfigRef.current
-      }
+      loadSharedModel(pendingConfigRef.current ?? config)
       return
     }
+    if (msg.type === 'debug_log') return
     if (msg.type === 'model_loaded') {
       const cfg = pendingConfigRef.current ?? config
       if (!cfg) return
@@ -79,8 +78,10 @@ export default function ViewScreen() {
         if (tintPercent > 0) viewerRef.current?.send({ type: 'apply_tint', meshName: window_id, tintPercent })
       })
       pendingConfigRef.current = null
+    } else if (msg.type === 'model_error') {
+      Alert.alert('Ошибка', `Не удалось загрузить модель\n\n${msg.message}`)
     }
-  }, [config])
+  }, [config, loadSharedModel])
 
   return (
     <GestureHandlerRootView style={styles.root}>

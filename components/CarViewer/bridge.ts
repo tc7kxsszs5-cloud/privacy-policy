@@ -18,14 +18,21 @@ export type WebViewToRN =
   | { type: 'mesh_tapped'; meshName: string; isGlass: boolean }
   | { type: 'model_loaded'; meshNames: string[] }
   | { type: 'model_error'; message: string }
+  | { type: 'debug_log'; message: string }
 
 export type MaterialFinish = 'gloss' | 'matte' | 'carbon' | 'chrome' | 'satin' | 'pearl'
 
 export function postToWebView(ref: React.RefObject<any>, msg: RNtoWebView) {
+  const payload = JSON.stringify(msg)
   ref.current?.injectJavaScript(`
-    window.dispatchEvent(new MessageEvent('message', {
-      data: ${JSON.stringify(JSON.stringify(msg))}
-    }));
+    (function () {
+      var payload = ${JSON.stringify(payload)};
+      if (typeof window.__CARWRAP_RECEIVE__ === 'function') {
+        window.__CARWRAP_RECEIVE__(payload);
+        return;
+      }
+      window.dispatchEvent(new MessageEvent('message', { data: payload }));
+    })();
     true;
   `)
 }

@@ -37,7 +37,10 @@ export default function BrandModelsScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
-            onPress={() => router.push(`/catalog/${brand}/${item.model}`)}
+            onPress={() => router.push({
+              pathname: '/catalog/[brand]/[model]',
+              params: { brand, model: item.model },
+            } as any)}
             activeOpacity={0.7}
           >
             {item.thumbnail_url ? (
