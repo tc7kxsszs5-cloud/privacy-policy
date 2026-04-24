@@ -3927,6 +3927,7 @@ three/build/three.module.js:
       'bone', 'helper', 'armature', 'ik', 'ctrl', 'target',
       'pivot', 'null', 'empty', 'root', 'rig', 'joint',
       'locator', 'dummy', 'gizmo', 'handle', 'control',
+      'int', // abbreviation for interior used in many 3D model naming conventions
     ]
     function isProtected(name) {
       if (!name) return true
@@ -3965,6 +3966,8 @@ three/build/three.module.js:
       'paint', 'body', 'hood', 'door', 'bumper', 'fender',
       'tailgate', 'roof', 'ceiling', 'quarter', 'panel',
       'mirror', 'trim', 'molding', 'spoiler', 'skirt', 'sill', 'valance',
+      'trunk', 'boot', 'bonnet', 'lid', 'facia', 'cowl',
+      'livrea', 'livery', // Italian/English livery = car body paint scheme
     ]
     function hasPaintableName(name) {
       const n = String(name || '').toLowerCase()
@@ -3985,21 +3988,36 @@ three/build/three.module.js:
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
       return mats.some(m => {
         const n = (m && m.name ? m.name : '').toLowerCase()
+        if (n.includes('glossy_black')) return false
         if (MAT_EXCLUDE.some(ex => n.includes(ex))) return false
         return (
           n.includes('palette') ||
           n.startsWith('base_') ||
-          n.includes('paint') ||
           n.includes('metallic') ||
           n.includes('main') ||
-          n.includes('body') ||
-          n.includes('mirror') ||
-          n.includes('trim') ||
-          n.includes('molding') ||
-          n.includes('spoiler') ||
-          n.includes('skirt') ||
-          n.includes('sill')
+          n.includes('pintura') ||  // Portuguese/Spanish: car paint
+          (n.includes('exterior') && !n.includes('interior')) ||
+          (n.startsWith('ext_') && !MAT_EXCLUDE.some(ex => n.includes(ex))) ||
+          BODY_ALLOW.some(kw => n.includes(kw)) // same keywords as mesh-name check
         )
+      })
+    }
+
+    // Used by geometry fallback — checks if material is explicitly non-paintable.
+    const FALLBACK_MAT_EXCLUDE = [
+      'chrome','glass','window','windshield','backlite','light','drl','lamp',
+      'tire','tyre','wheel','rim','janta','brake','rotor','disc','caliper',
+      'exhaust','grille','license','plate','interior',
+      'undercarr','carrier','reflector','stitches','leather','seat',
+      'dashboard','carpet','console','emblem','logo','badge',
+      'plastic','rubber','screw','bolt','net','wire','grid','world',
+    ]
+    function hasExcludedMaterial(mesh) {
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      return mats.some(m => {
+        const n = (m?.name || '').toLowerCase()
+        if (n.startsWith('int_')) return true
+        return FALLBACK_MAT_EXCLUDE.some(ex => n.includes(ex))
       })
     }
 
@@ -4129,6 +4147,20 @@ three/build/three.module.js:
             }
           }
         })
+
+        // Fallback: if no paintable meshes found via keyword detection,
+        // use geometry-only pass — catches models with non-standard naming conventions.
+        if (meshNames.length === 0) {
+          carModel.traverse(child => {
+            if (!child.isMesh || !child.name) return
+            if (isGlass(child.name) || isHelperGeometry(child)) return
+            if (!isPaintableGeometry(child)) return
+            if (hasExcludedMaterial(child)) return
+            meshesArray.push(child)
+            meshNames.push(child.name)
+          })
+          if (meshNames.length > 0) debugLog('fallback:geometry meshes=' + meshNames.length)
+        }
 
         scene.add(carModel)
         document.getElementById('loading').style.display = 'none'

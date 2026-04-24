@@ -54,7 +54,6 @@ export function registerAiWrapRoute(app: Hono) {
     form.append('quality', quality)
     form.append('size', size)
     form.append('n', '1')
-    form.append('response_format', 'b64_json')
 
     const openAiResponse = await fetch('https://api.openai.com/v1/images/edits', {
       method: 'POST',
@@ -64,6 +63,7 @@ export function registerAiWrapRoute(app: Hono) {
 
     const data = await openAiResponse.json().catch(() => null)
     if (!openAiResponse.ok) {
+      console.error('OpenAI error:', JSON.stringify(data))
       const message = data?.error?.message || 'OpenAI не смог обработать фото'
       return c.json({ error: message }, openAiResponse.status as any)
     }
