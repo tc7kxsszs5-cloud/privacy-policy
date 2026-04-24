@@ -3840,7 +3840,8 @@ three/build/three.module.js:
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.3
+    const BASE_EXPOSURE = 1.3
+    renderer.toneMappingExposure = BASE_EXPOSURE
     renderer.outputColorSpace = THREE.SRGBColorSpace
     document.body.appendChild(renderer.domElement)
 
@@ -3910,6 +3911,17 @@ three/build/three.module.js:
       'turn', 'led', 'lens',
       'interior', 'seat', 'dashboard',
       'cabin', 'steering', 'brake',
+      'wheel', 'rim', 'tyre', 'tire', 'emblem', 'logo', 'badge',
+      'caliper', 'disc', 'rotor', 'hub',
+      'engine', 'mechanical', 'wishbone', 'arm', 'underbody', 'turbo',
+      'tray', 'transmission', 'transfercase', 'tierod', 'swaybar',
+      'subframe', 'strut', 'spring', 'shock', 'beam', 'radiator',
+      'fan', 'filter', 'intercooler', 'intake', 'halfshaft',
+      'fueltank', 'exhaust', 'driveshaft', 'diff', 'chassis',
+      'airbox', 'grille', 'lettering', 'shifter', 'pedal', 'stalk',
+      'shelf', 'wiper', 'seal', 'reflector', 'chrome', 'plastic',
+      'leather', 'stitches', 'speakers', 'wood', 'gauges', 'symbols',
+      'janta', 'mirror',
       'carpet', 'trim_int', 'console',
       'bone', 'helper', 'armature', 'ik', 'ctrl', 'target',
       'pivot', 'null', 'empty', 'root', 'rig', 'joint',
@@ -3924,6 +3936,50 @@ three/build/three.module.js:
     function isHelperGeometry(mesh) {
       const count = mesh.geometry?.attributes?.position?.count ?? 0
       return count > 0 && count <= 24
+    }
+
+    function meshWorldBounds(mesh) {
+      mesh.updateWorldMatrix(true, false)
+      return new THREE.Box3().setFromObject(mesh)
+    }
+
+    function isPaintableGeometry(mesh) {
+      if (!mesh?.geometry) return false
+      const pos = mesh.geometry.attributes?.position
+      const count = pos?.count ?? 0
+      if (count < 80) return false
+
+      const box = meshWorldBounds(mesh)
+      const size = box.getSize(new THREE.Vector3())
+      const maxSide = Math.max(size.x, size.y, size.z)
+      const volume = Math.max(size.x, 0.001) * Math.max(size.y, 0.001) * Math.max(size.z, 0.001)
+
+      if (maxSide < 0.12 || volume < 0.0015) return false
+      if (size.x < 0.018 || size.y < 0.018 || size.z < 0.018) return false
+
+      return true
+    }
+
+    const BODY_ALLOW = [
+      'paint', 'body', 'hood', 'door', 'bumper', 'fender',
+      'tailgate', 'roof', 'ceiling', 'quarter', 'panel'
+    ]
+    function hasPaintableName(name) {
+      const n = String(name || '').toLowerCase()
+      if (n.includes('glossy_black')) return false
+      return BODY_ALLOW.some(part => n.includes(part))
+    }
+
+    function isPaintableMesh(mesh) {
+      return Boolean(
+        mesh &&
+        mesh.name &&
+        !isProtected(mesh.name) &&
+        !isGlass(mesh.name) &&
+        hasPaintableName(mesh.name) &&
+        !isHelperGeometry(mesh) &&
+        isPaintableGeometry(mesh)
+      )
     }
 
     const GLASS = ['glass', 'window', 'windshield', 'windscreen', 'backlite']
@@ -3994,6 +4050,16 @@ three/build/three.module.js:
 
       gltfLoader.load(url, (gltf) => {
         carModel = gltf.scene
+        const embeddedLights = []
+        carModel.traverse(child => {
+          if (child.isLight) embeddedLights.push(child)
+        })
+        embeddedLights.forEach(light => {
+          if (light.parent) light.parent.remove(light)
+        })
+        if (embeddedLights.length > 0) {
+          debugLog('loadModel:removed embedded lights=' + embeddedLights.length)
+        }
 
         const box = new THREE.Box3().setFromObject(carModel)
         const center = box.getCenter(new THREE.Vector3())
@@ -4024,7 +4090,7 @@ three/build/three.module.js:
 
           if (child.name) {
             meshByName[child.name] = child
-            if (!isProtected(child.name) && !isHelperGeometry(child)) {
+            if (isPaintableMesh(child)) {
               meshesArray.push(child)
               meshNames.push(child.name)
             }
@@ -4059,7 +4125,7 @@ three/build/three.module.js:
     function applyMaterial(meshName, colorHex, finish) {
       if (!carModel || !meshName || isProtected(meshName) || isGlass(meshName)) return
       const mesh = meshByName[meshName]
-      if (!mesh || isHelperGeometry(mesh)) return
+      if (!isPaintableMesh(mesh)) return
 
       const color = new THREE.Color(colorHex)
 
@@ -4072,20 +4138,20 @@ three/build/three.module.js:
         mat.onBeforeCompile = (shader) => {
           shader.vertexShader = shader.vertexShader.replace(
             inc + ' <worldpos_vertex>',
-            inc + ' <worldpos_vertex>\n            vWorldPos = worldPosition.xyz;'
+            inc + ' <worldpos_vertex>\\n            vWorldPos = worldPosition.xyz;'
           )
-          shader.vertexShader = 'varying vec3 vWorldPos;\n' + shader.vertexShader
-          shader.fragmentShader = 'varying vec3 vWorldPos;\n' + shader.fragmentShader
+          shader.vertexShader = 'varying vec3 vWorldPos;\\n' + shader.vertexShader
+          shader.fragmentShader = 'varying vec3 vWorldPos;\\n' + shader.fragmentShader
           shader.fragmentShader = shader.fragmentShader.replace(
             inc + ' <color_fragment>',
-            inc + ' <color_fragment>\n' +
-            '            vec2 wp = vWorldPos.xz * 18.0;\n' +
-            '            vec2 cell = floor(wp);\n' +
-            '            vec2 f = fract(wp);\n' +
-            '            float angle = mod(cell.x + cell.y, 2.0) * 0.7854;\n' +
-            '            float s = sin(angle), c2 = cos(angle);\n' +
-            '            vec2 rot = vec2(c2*(f.x-0.5) - s*(f.y-0.5), s*(f.x-0.5) + c2*(f.y-0.5));\n' +
-            '            float fiber = smoothstep(0.28, 0.34, abs(rot.x)) * 0.4;\n' +
+            inc + ' <color_fragment>\\n' +
+            '            vec2 wp = vWorldPos.xz * 18.0;\\n' +
+            '            vec2 cell = floor(wp);\\n' +
+            '            vec2 f = fract(wp);\\n' +
+            '            float angle = mod(cell.x + cell.y, 2.0) * 0.7854;\\n' +
+            '            float s = sin(angle), c2 = cos(angle);\\n' +
+            '            vec2 rot = vec2(c2*(f.x-0.5) - s*(f.y-0.5), s*(f.x-0.5) + c2*(f.y-0.5));\\n' +
+            '            float fiber = smoothstep(0.28, 0.34, abs(rot.x)) * 0.4;\\n' +
             '            diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.35, fiber);'
           )
         }
@@ -4158,21 +4224,10 @@ three/build/three.module.js:
     function setStudioMode(enabled) {
       if (enabled) {
         scene.background = new THREE.Color(0xf0f0f0)
-        ambientLight.intensity = 3.5
-        keyLight.intensity = 4.0
-        fillLight.intensity = 3.0
-        rimLight.intensity = 2.5
-        topLight.intensity = 2.0
-        renderer.toneMappingExposure = 1.8
       } else {
         scene.background = new THREE.Color(0x1a1a1a)
-        ambientLight.intensity = 1.8
-        keyLight.intensity = 2.8
-        fillLight.intensity = 1.6
-        rimLight.intensity = 1.4
-        topLight.intensity = 1.0
-        renderer.toneMappingExposure = 1.3
       }
+      renderer.toneMappingExposure = BASE_EXPOSURE
     }
 
     // ─── Reset all ───────────────────────────────────────────────────────────
@@ -4207,7 +4262,7 @@ three/build/three.module.js:
         const hits = raycaster.intersectObjects(meshesArray, false)
         for (const hit of hits) {
           const name = hit.object.name
-          if (!name || seen.has(name) || isProtected(name)) continue
+          if (!name || seen.has(name) || !isPaintableMesh(hit.object)) continue
           seen.add(name)
           candidates.push({ name, dist: hit.distance })
           break

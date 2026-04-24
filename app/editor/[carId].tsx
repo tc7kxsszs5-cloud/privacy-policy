@@ -194,6 +194,12 @@ export default function EditorScreen() {
           <Text style={styles.resetText}>Сбросить</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        style={styles.aiPhotoBtn}
+        onPress={() => router.push('/ai-wrap' as any)}
+      >
+        <Text style={styles.aiPhotoBtnText}>AI фото</Text>
+      </TouchableOpacity>
 
       <CarViewer ref={viewerRef} onMessage={handleViewerMessage} />
 
@@ -257,6 +263,17 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   backText: { color: '#C9A84C', fontSize: 16 },
   resetText: { color: '#e63946', fontSize: 14 },
+  aiPhotoBtn: {
+    position: 'absolute',
+    top: 112,
+    right: 16,
+    zIndex: 10,
+    backgroundColor: 'rgba(201,168,76,0.92)',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  aiPhotoBtnText: { color: '#0a0a0a', fontSize: 13, fontWeight: '900' },
   actionBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: 'rgba(10,10,10,0.95)',

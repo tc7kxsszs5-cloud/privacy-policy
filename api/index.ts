@@ -2,12 +2,14 @@ import { Hono } from 'hono'
 import { trpcServer } from '@hono/trpc-server'
 import { handle } from 'hono/vercel'
 import { appRouter } from '../backend/trpc/app-router'
+import { registerAiWrapRoute } from '../backend/ai-wrap'
 
 export const config = { runtime: 'edge' }
 
 const app = new Hono().basePath('/api')
 
 app.use('/trpc/*', trpcServer({ router: appRouter }))
+registerAiWrapRoute(app)
 
 app.get('/health', (c) => c.json({ ok: true }))
 

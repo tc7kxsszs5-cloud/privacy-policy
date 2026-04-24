@@ -27,7 +27,9 @@
       "bundleIdentifier": "com.kiku79.detailingtime",
       "buildNumber": "43",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "Detailing Time использует фото автомобиля, чтобы показать примерку пленки.",
+        "NSPhotoLibraryAddUsageDescription": "Detailing Time может сохранять результат примерки пленки в вашу галерею."
       }
     },
     "extra": {

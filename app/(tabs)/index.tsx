@@ -88,6 +88,31 @@ export default function HomeScreen() {
         {/* ── НАШИ РАБОТЫ — широкая большая ── */}
         <TouchableOpacity
           style={styles.featuredCard}
+          onPress={() => router.push('/ai-wrap' as any)}
+          activeOpacity={0.88}
+        >
+          <Image
+            source={require('@/assets/services/hybrid.jpg')}
+            style={styles.wideImage}
+            resizeMode="cover"
+          />
+          <View style={styles.wideOverlayTop} />
+          <View style={styles.wideOverlayBottom} />
+          <View style={styles.wideContent}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>AI ПРИМЕРКА</Text>
+            </View>
+            <Text style={styles.wideTitle}>Загрузи своё авто</Text>
+            <Text style={styles.wideDesc}>
+              Примерь цвет, мат, хром, карбон или дизайн пленки на реальном фото машины.
+            </Text>
+            <Text style={styles.wideLink}>Открыть примерку →</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* ── НАШИ РАБОТЫ — широкая большая ── */}
+        <TouchableOpacity
+          style={styles.featuredCard}
           onPress={() => router.push('/studio/gallery' as any)}
           activeOpacity={0.88}
         >
