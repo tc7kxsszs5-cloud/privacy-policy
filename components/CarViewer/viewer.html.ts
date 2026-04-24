@@ -3921,7 +3921,8 @@ three/build/three.module.js:
       'airbox', 'grille', 'lettering', 'shifter', 'pedal', 'stalk',
       'shelf', 'wiper', 'seal', 'reflector', 'chrome', 'plastic',
       'leather', 'stitches', 'speakers', 'wood', 'gauges', 'symbols',
-      'janta', 'mirror',
+      'janta',
+      // mirror — убрано: боковые зеркала оклеиваются в реальной оклейке
       'carpet', 'trim_int', 'console',
       'bone', 'helper', 'armature', 'ik', 'ctrl', 'target',
       'pivot', 'null', 'empty', 'root', 'rig', 'joint',
@@ -3962,12 +3963,44 @@ three/build/three.module.js:
 
     const BODY_ALLOW = [
       'paint', 'body', 'hood', 'door', 'bumper', 'fender',
-      'tailgate', 'roof', 'ceiling', 'quarter', 'panel'
+      'tailgate', 'roof', 'ceiling', 'quarter', 'panel',
+      'mirror', 'trim', 'molding', 'spoiler', 'skirt', 'sill', 'valance',
     ]
     function hasPaintableName(name) {
       const n = String(name || '').toLowerCase()
       if (n.includes('glossy_black')) return false
       return BODY_ALLOW.some(part => n.includes(part))
+    }
+
+    // Fallback: если имя меша не даёт информации, проверяем имя материала.
+    // Покрываем: PaletteMaterial, Paint_Color, *_Metallic, *Mirror*, *Trim*, *Body* и т.п.
+    const MAT_EXCLUDE = [
+      'chrome','glass','window','windshield','backlite','light','drl','lamp',
+      'tire','tyre','wheel','rim','janta','brake','rotor','disc','caliper',
+      'exhaust','grille','license','plate','interior',
+      'undercarr','carrier','reflector','stitches','leather','seat',
+      'dashboard','carpet','console','emblem','logo','badge',
+    ]
+    function hasPaintableMaterial(mesh) {
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      return mats.some(m => {
+        const n = (m && m.name ? m.name : '').toLowerCase()
+        if (MAT_EXCLUDE.some(ex => n.includes(ex))) return false
+        return (
+          n.includes('palette') ||
+          n.startsWith('base_') ||
+          n.includes('paint') ||
+          n.includes('metallic') ||
+          n.includes('main') ||
+          n.includes('body') ||
+          n.includes('mirror') ||
+          n.includes('trim') ||
+          n.includes('molding') ||
+          n.includes('spoiler') ||
+          n.includes('skirt') ||
+          n.includes('sill')
+        )
+      })
     }
 
     function isPaintableMesh(mesh) {
@@ -3976,7 +4009,7 @@ three/build/three.module.js:
         mesh.name &&
         !isProtected(mesh.name) &&
         !isGlass(mesh.name) &&
-        hasPaintableName(mesh.name) &&
+        (hasPaintableName(mesh.name) || hasPaintableMaterial(mesh)) &&
         !isHelperGeometry(mesh) &&
         isPaintableGeometry(mesh)
       )
