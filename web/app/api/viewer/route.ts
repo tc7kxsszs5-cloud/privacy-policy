@@ -1,7 +1,9 @@
-import { VIEWER_HTML } from '@/../components/CarViewer/viewer.html'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 export async function GET() {
-  return new Response(VIEWER_HTML, {
+  const html = readFileSync(join(process.cwd(), 'public', 'viewer.html'), 'utf-8')
+  return new Response(html, {
     headers: { 'Content-Type': 'text/html; charset=utf-8' },
   })
 }

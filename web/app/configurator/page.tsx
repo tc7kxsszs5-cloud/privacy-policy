@@ -207,7 +207,7 @@ export default function ConfiguratorPage() {
           <iframe
             key={selectedCar.key}
             ref={iframeRef}
-            src={`/viewer.html?glb=/models/${selectedCar.key}.glb`}
+            src={`/viewer.html?glb=https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCar.key}.glb`}
             className="w-full h-full border-0"
           />
         </div>
