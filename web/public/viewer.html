@@ -3971,6 +3971,8 @@ three/build/three.module.js:
       'arch', 'wheelarch', 'wheel_arch', 'wing', 'flare', 'overfender',
       'rim', 'wheel', 'disc', 'janta',
       'chrome', 'grille', 'plastic',
+      'carrozzeria', 'colour', 'color_car', 'lacquer',
+      'qimian', 'cheqi', 'lacque',
     ]
     function hasPaintableName(name) {
       const n = String(name || '').toLowerCase()
@@ -3998,10 +4000,13 @@ three/build/three.module.js:
           n.startsWith('base_') ||
           n.includes('metallic') ||
           n.includes('main') ||
-          n.includes('pintura') ||  // Portuguese/Spanish: car paint
+          n.includes('pintura') ||
+          n.includes('colour') ||
+          n.includes('car_paint') || n.includes('carpaint') ||
+          n.startsWith('car_') ||
           (n.includes('exterior') && !n.includes('interior')) ||
           (n.startsWith('ext_') && !MAT_EXCLUDE.some(ex => n.includes(ex))) ||
-          BODY_ALLOW.some(kw => n.includes(kw)) // same keywords as mesh-name check
+          BODY_ALLOW.some(kw => n.includes(kw))
         )
       })
     }
@@ -4013,7 +4018,7 @@ three/build/three.module.js:
       'exhaust','grille','license','plate','interior',
       'undercarr','carrier','reflector','stitches','leather','seat',
       'dashboard','carpet','console','emblem','logo','badge',
-      'plastic','rubber','screw','bolt','net','wire','grid','world',
+      'rubber','screw','bolt','net','wire','grid','world',
     ]
     function hasExcludedMaterial(mesh) {
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
@@ -4152,6 +4157,12 @@ three/build/three.module.js:
           }
 
           if (child.name) {
+            // Deduplicate names: if name already taken, append _2, _3, ...
+            if (meshByName[child.name]) {
+              let i = 2
+              while (meshByName[`${child.name}_${i}`]) i++
+              child.name = `${child.name}_${i}`
+            }
             meshByName[child.name] = child
             if (isPaintableMesh(child)) {
               meshesArray.push(child)
