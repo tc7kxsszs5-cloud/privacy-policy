@@ -4043,6 +4043,14 @@ three/build/three.module.js:
       return GLASS.some(p => n.includes(p))
     }
 
+    const WHEEL_KW = ['rim', 'wheel', 'disc', 'janta', 'tire', 'tyre', 'brake', 'rotor', 'caliper']
+    function isWheelMesh(mesh) {
+      const n = (mesh?.name || '').toLowerCase()
+      const mats = Array.isArray(mesh?.material) ? mesh.material : [mesh?.material]
+      const mn = mats.map(m => (m?.name || '').toLowerCase()).join(' ')
+      return WHEEL_KW.some(kw => n.includes(kw) || mn.includes(kw))
+    }
+
     // ─── State ───────────────────────────────────────────────────────────────
     let carModel = null
     const meshMaterials = {}
@@ -4168,12 +4176,12 @@ three/build/three.module.js:
 
         scene.add(carModel)
         document.getElementById('loading').style.display = 'none'
-        console.log('[viewer] model loaded, meshes:', meshNames.length);
         debugLog('loadModel:success meshes=' + meshNames.length)
+        const bodyMeshNames = meshNames.filter(n => !isWheelMesh(meshByName[n]))
         if (isObjectUrl) {
           revokeCurrentObjectUrl()
         }
-        sendToRN({ type: 'model_loaded', meshNames })
+        sendToRN({ type: 'model_loaded', meshNames, bodyMeshNames })
       },
       undefined,
       (err) => {

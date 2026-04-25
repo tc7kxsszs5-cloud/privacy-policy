@@ -38,6 +38,7 @@ export default function ConfiguratorPage() {
   const loadedRef = useRef(false)
   const selectedCarRef = useRef(CARS[0])
   const meshNamesRef = useRef<string[]>([])
+  const bodyMeshNamesRef = useRef<string[]>([])
   const selectedColorRef = useRef<Material>(MATERIALS[0])
   const selectedMeshRef = useRef<string | null>(null)
 
@@ -52,6 +53,7 @@ export default function ConfiguratorPage() {
     loadedRef.current = false
     setMeshNames([])
     meshNamesRef.current = []
+    bodyMeshNamesRef.current = []
     setSelectedMesh(null)
     selectedMeshRef.current = null
   }
@@ -65,8 +67,8 @@ export default function ConfiguratorPage() {
   function applyColor(color: Material) {
     setSelectedColor(color)
     selectedColorRef.current = color
-    const names = meshNamesRef.current
-    if (names.length === 0) {
+    const bodyNames = bodyMeshNamesRef.current
+    if (bodyNames.length === 0 && meshNamesRef.current.length === 0) {
       pendingColorRef.current = color
       return
     }
@@ -74,7 +76,7 @@ export default function ConfiguratorPage() {
     if (mesh) {
       sendToViewer({ type: 'apply_material', meshName: mesh, colorHex: color.colorHex, finish: color.finish })
     } else {
-      applyColorToAll(color, names)
+      applyColorToAll(color, bodyNames.length > 0 ? bodyNames : meshNamesRef.current)
     }
   }
 
@@ -92,12 +94,14 @@ export default function ConfiguratorPage() {
         sendToViewer({ type: 'load_model', glbUrl: url })
       } else if (msg?.type === 'model_loaded') {
         const names: string[] = msg.meshNames ?? []
+        const bodyNames: string[] = msg.bodyMeshNames ?? names
         setMeshNames(names)
         meshNamesRef.current = names
+        bodyMeshNamesRef.current = bodyNames
         setLoaded(true)
         loadedRef.current = true
         if (pendingColorRef.current) {
-          applyColorToAll(pendingColorRef.current, names)
+          applyColorToAll(pendingColorRef.current, bodyNames)
           pendingColorRef.current = null
         }
       } else if (msg?.type === 'model_error') {
