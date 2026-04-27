@@ -275,7 +275,7 @@ export default function ConfiguratorPage() {
               const url = `https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCarRef.current.key}.glb`
               sendToViewer({ type: 'load_model', glbUrl: url })
             }
-          }, 300)
+          }, 1500)
         }}
       />
     </div>
