@@ -269,13 +269,11 @@ export default function ConfiguratorPage() {
         src="/viewer.html"
         className="w-full h-full border-0"
         onLoad={() => {
-          // Safari race condition fix: if ready was missed, send load_model after iframe loads
-          setTimeout(() => {
-            if (!readyReceivedRef.current && !loadedRef.current) {
-              const url = `https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCarRef.current.key}.glb`
-              sendToViewer({ type: 'load_model', glbUrl: url })
-            }
-          }, 1500)
+          // Always send load_model from onLoad — don't rely on 'ready' message.
+          // 'ready' fires before React's useEffect registers the listener (race condition).
+          readyReceivedRef.current = true
+          const url = `https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCarRef.current.key}.glb`
+          sendToViewer({ type: 'load_model', glbUrl: url })
         }}
       />
     </div>
