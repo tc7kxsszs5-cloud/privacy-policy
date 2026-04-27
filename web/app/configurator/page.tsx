@@ -54,6 +54,7 @@ export default function ConfiguratorPage() {
   const [meshNames, setMeshNames] = useState<string[]>([])
   const [selectedMesh, setSelectedMesh] = useState<string | null>(null)
   const [mobileTab, setMobileTab] = useState<MobileTab>('models')
+  const [isMobile, setIsMobile] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const pendingColorRef = useRef<Material | null>(null)
   const loadedRef = useRef(false)
@@ -108,6 +109,13 @@ export default function ConfiguratorPage() {
     selectedMeshRef.current = meshName
     sendToViewer({ type: 'highlight_mesh', meshName: meshName ?? '' })
   }
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     function handleMsg(e: MessageEvent) {
@@ -283,55 +291,52 @@ export default function ConfiguratorPage() {
     <main className="flex flex-col h-screen overflow-hidden">
       <Navbar active={undefined} />
 
-      {/* Desktop layout */}
-      <div className="hidden md:flex flex-1 overflow-hidden pt-16">
-        <div className="w-56 shrink-0 bg-[#0d0d0d] border-r border-[#1a1a1a] overflow-y-auto">
-          {carListContent}
+      {isMobile ? (
+        /* Mobile layout */
+        <div className="flex flex-col flex-1 overflow-hidden pt-16">
+          <div className="h-[40vh] shrink-0">
+            {viewerBlock}
+          </div>
+          <div className="flex border-t border-b border-[#1a1a1a] bg-[#0d0d0d] shrink-0">
+            <button
+              onClick={() => setMobileTab('models')}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                mobileTab === 'models' ? 'text-[#C9A84C] border-b-2 border-[#C9A84C]' : 'text-[#555]'
+              }`}
+            >
+              Модели
+            </button>
+            <button
+              onClick={() => setMobileTab('colors')}
+              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+                mobileTab === 'colors' ? 'text-[#C9A84C] border-b-2 border-[#C9A84C]' : 'text-[#555]'
+              }`}
+            >
+              Цвета
+            </button>
+          </div>
+          <div className="flex-1 overflow-hidden bg-[#0d0d0d] flex flex-col">
+            {mobileTab === 'models' ? (
+              <div className="flex-1 overflow-y-auto">{carListContent}</div>
+            ) : (
+              <div className="flex-1 flex flex-col overflow-hidden">{colorPanelContent}</div>
+            )}
+          </div>
         </div>
-        <div className="flex-1 relative">
-          {viewerBlock}
+      ) : (
+        /* Desktop layout */
+        <div className="flex flex-1 overflow-hidden pt-16">
+          <div className="w-56 shrink-0 bg-[#0d0d0d] border-r border-[#1a1a1a] overflow-y-auto">
+            {carListContent}
+          </div>
+          <div className="flex-1 relative">
+            {viewerBlock}
+          </div>
+          <div className="w-64 shrink-0 bg-[#0d0d0d] border-l border-[#1a1a1a] flex flex-col">
+            {colorPanelContent}
+          </div>
         </div>
-        <div className="w-64 shrink-0 bg-[#0d0d0d] border-l border-[#1a1a1a] flex flex-col">
-          {colorPanelContent}
-        </div>
-      </div>
-
-      {/* Mobile layout */}
-      <div className="flex md:hidden flex-col flex-1 overflow-hidden pt-16">
-        {/* 3D Viewer — top half */}
-        <div className="h-[40vh] shrink-0">
-          {viewerBlock}
-        </div>
-
-        {/* Tab bar */}
-        <div className="flex border-t border-b border-[#1a1a1a] bg-[#0d0d0d] shrink-0">
-          <button
-            onClick={() => setMobileTab('models')}
-            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-              mobileTab === 'models' ? 'text-[#C9A84C] border-b-2 border-[#C9A84C]' : 'text-[#555]'
-            }`}
-          >
-            Модели
-          </button>
-          <button
-            onClick={() => setMobileTab('colors')}
-            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-              mobileTab === 'colors' ? 'text-[#C9A84C] border-b-2 border-[#C9A84C]' : 'text-[#555]'
-            }`}
-          >
-            Цвета
-          </button>
-        </div>
-
-        {/* Tab content */}
-        <div className="flex-1 overflow-hidden bg-[#0d0d0d] flex flex-col">
-          {mobileTab === 'models' ? (
-            <div className="flex-1 overflow-y-auto">{carListContent}</div>
-          ) : (
-            <div className="flex-1 flex flex-col overflow-hidden">{colorPanelContent}</div>
-          )}
-        </div>
-      </div>
+      )}
     </main>
   )
 }
