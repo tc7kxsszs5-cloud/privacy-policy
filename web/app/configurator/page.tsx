@@ -266,7 +266,7 @@ export default function ConfiguratorPage() {
       <iframe
         key={selectedCar.key}
         ref={iframeRef}
-        src={`/viewer.html?glb=https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCar.key}.glb`}
+        src="/viewer.html"
         className="w-full h-full border-0"
         onLoad={() => {
           // Safari race condition fix: if ready was missed, send load_model after iframe loads
