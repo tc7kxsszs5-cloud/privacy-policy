@@ -5,6 +5,8 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { MATERIALS, FINISHES, FINISH_LABELS, type Material, type Finish } from '@/lib/catalog'
 
+type MobileTab = 'models' | 'colors'
+
 const CARS = [
   { key: 'audi_rs5', label: 'Audi RS5', brand: 'Audi' },
   { key: 'bmw_1m', label: 'BMW 1M', brand: 'BMW' },
@@ -45,16 +47,18 @@ const CARS = [
 ]
 
 export default function ConfiguratorPage() {
-  const [selectedCar, setSelectedCar] = useState(CARS[0])
+  const [selectedCar, setSelectedCar] = useState(CARS.find(c => c.key === 'bmw_m4_csl') ?? CARS[0])
   const [selectedColor, setSelectedColor] = useState<Material>(MATERIALS[0])
   const [activeFinish, setActiveFinish] = useState<Finish>('gloss')
   const [loaded, setLoaded] = useState(false)
   const [meshNames, setMeshNames] = useState<string[]>([])
   const [selectedMesh, setSelectedMesh] = useState<string | null>(null)
+  const [mobileTab, setMobileTab] = useState<MobileTab>('models')
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const pendingColorRef = useRef<Material | null>(null)
   const loadedRef = useRef(false)
-  const selectedCarRef = useRef(CARS[0])
+  const readyReceivedRef = useRef(false)
+  const selectedCarRef = useRef(CARS.find(c => c.key === 'bmw_m4_csl') ?? CARS[0])
   const meshNamesRef = useRef<string[]>([])
   const bodyMeshNamesRef = useRef<string[]>([])
   const selectedColorRef = useRef<Material>(MATERIALS[0])
@@ -69,6 +73,7 @@ export default function ConfiguratorPage() {
     selectedCarRef.current = car
     setLoaded(false)
     loadedRef.current = false
+    readyReceivedRef.current = false
     setMeshNames([])
     meshNamesRef.current = []
     bodyMeshNamesRef.current = []
@@ -108,7 +113,8 @@ export default function ConfiguratorPage() {
     function handleMsg(e: MessageEvent) {
       const msg = e.data
       if (msg?.type === 'ready') {
-        const url = `/models/${selectedCarRef.current.key}.glb`
+        readyReceivedRef.current = true
+        const url = `https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCarRef.current.key}.glb`
         sendToViewer({ type: 'load_model', glbUrl: url })
       } else if (msg?.type === 'model_loaded') {
         const names: string[] = msg.meshNames ?? []
@@ -148,137 +154,184 @@ export default function ConfiguratorPage() {
 
   const brands = [...new Set(CARS.map(c => c.brand))]
 
+  const carListContent = (
+    <div className="p-4">
+      <p className="text-[#555] text-xs font-semibold tracking-widest uppercase mb-4">Модели</p>
+      {brands.map(brand => (
+        <div key={brand} className="mb-4">
+          <p className="text-[#444] text-[10px] uppercase tracking-wider mb-2">{brand}</p>
+          {CARS.filter(c => c.brand === brand).map(car => (
+            <button
+              key={car.key}
+              onClick={() => loadCar(car)}
+              className={`w-full text-left px-3 py-2 rounded-xl text-sm mb-1 transition-colors ${
+                selectedCar.key === car.key
+                  ? 'bg-[#C9A84C]/10 text-[#C9A84C] font-medium'
+                  : 'text-[#888] hover:text-white hover:bg-[#1a1a1a]'
+              }`}
+            >
+              {car.label}
+            </button>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+
+  const colorPanelContent = (
+    <>
+      <div className="px-4 pt-4 pb-3 border-b border-[#1a1a1a]">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl shrink-0 border border-white/10" style={{ backgroundColor: selectedColor.colorHex }} />
+          <div className="min-w-0">
+            <p className="text-white text-sm font-semibold truncate">{selectedColor.name}</p>
+            <p className="text-[#555] text-[11px]">{FINISH_LABELS[selectedColor.finish]} · {selectedColor.brand}</p>
+          </div>
+        </div>
+        {selectedMesh && (
+          <p className="text-[#C9A84C]/70 text-[10px] mt-2 truncate">Деталь: {selectedMesh}</p>
+        )}
+      </div>
+      <div className="flex gap-1 px-3 pt-3 pb-2 flex-wrap">
+        {FINISHES.map(f => (
+          <button
+            key={f}
+            onClick={() => setActiveFinish(f)}
+            className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
+              activeFinish === f
+                ? 'bg-[#C9A84C] text-black'
+                : 'bg-[#151515] text-[#666] hover:text-[#aaa]'
+            }`}
+          >
+            {FINISH_LABELS[f]}
+          </button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-y-auto px-3 pb-3">
+        <div className="grid grid-cols-4 gap-1.5">
+          {MATERIALS.filter(m => m.finish === activeFinish).map(color => (
+            <button
+              key={color.id}
+              title={`${color.name} · ${color.brand} ${color.sku}`}
+              onClick={() => applyColor(color)}
+              className={`aspect-square rounded-xl border-2 transition-all hover:scale-105 ${
+                selectedColor.id === color.id
+                  ? 'border-[#C9A84C] scale-110'
+                  : 'border-transparent hover:border-[#444]'
+              }`}
+              style={{ backgroundColor: color.colorHex }}
+            />
+          ))}
+        </div>
+        {/* Buttons after color grid — visible after scrolling */}
+        <div className="mt-4 space-y-2">
+          <a
+            href="tel:+74954111003"
+            className="block w-full text-center bg-[#C9A84C] text-black font-bold py-3 rounded-xl text-sm"
+          >
+            Записаться
+          </a>
+          <Link
+            href="/ai-wrap"
+            className="block w-full text-center border border-[#C9A84C]/30 text-[#C9A84C] font-semibold py-3 rounded-xl text-sm"
+          >
+            AI примерка ✦
+          </Link>
+        </div>
+      </div>
+    </>
+  )
+
+  const viewerBlock = (
+    <div className="relative w-full h-full bg-[#666]">
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="text-center">
+            <div className="w-10 h-10 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-[#aaa] text-sm">Загрузка модели...</p>
+          </div>
+        </div>
+      )}
+      {loaded && selectedMesh && (
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <span className="text-[#C9A84C] text-xs font-semibold truncate max-w-[160px]">{selectedMesh}</span>
+          <button onClick={() => selectMesh(null)} className="text-[#888] hover:text-white text-xs leading-none">✕</button>
+        </div>
+      )}
+      {loaded && !selectedMesh && (
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+          <span className="text-white/30 text-xs">Нажмите на деталь для выбора</span>
+        </div>
+      )}
+      <iframe
+        key={selectedCar.key}
+        ref={iframeRef}
+        src={`/viewer.html?glb=https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCar.key}.glb`}
+        className="w-full h-full border-0"
+        onLoad={() => {
+          // Safari race condition fix: if ready was missed, send load_model after iframe loads
+          setTimeout(() => {
+            if (!readyReceivedRef.current && !loadedRef.current) {
+              const url = `https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCarRef.current.key}.glb`
+              sendToViewer({ type: 'load_model', glbUrl: url })
+            }
+          }, 300)
+        }}
+      />
+    </div>
+  )
+
   return (
     <main className="flex flex-col h-screen overflow-hidden">
       <Navbar active={undefined} />
 
-      <div className="flex flex-1 overflow-hidden pt-16">
-        {/* Sidebar — car selection */}
+      {/* Desktop layout */}
+      <div className="hidden md:flex flex-1 overflow-hidden pt-16">
         <div className="w-56 shrink-0 bg-[#0d0d0d] border-r border-[#1a1a1a] overflow-y-auto">
-          <div className="p-4">
-            <p className="text-[#555] text-xs font-semibold tracking-widest uppercase mb-4">Модели</p>
-            {brands.map(brand => (
-              <div key={brand} className="mb-4">
-                <p className="text-[#444] text-[10px] uppercase tracking-wider mb-2">{brand}</p>
-                {CARS.filter(c => c.brand === brand).map(car => (
-                  <button
-                    key={car.key}
-                    onClick={() => loadCar(car)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-sm mb-1 transition-colors ${
-                      selectedCar.key === car.key
-                        ? 'bg-[#C9A84C]/10 text-[#C9A84C] font-medium'
-                        : 'text-[#888] hover:text-white hover:bg-[#1a1a1a]'
-                    }`}
-                  >
-                    {car.label}
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>
+          {carListContent}
         </div>
-
-        {/* 3D Viewer */}
-        <div className="flex-1 relative bg-[#666]">
-          {!loaded && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="text-center">
-                <div className="w-10 h-10 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-[#aaa] text-sm">Загрузка модели...</p>
-              </div>
-            </div>
-          )}
-          {loaded && selectedMesh && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
-              <span className="text-[#C9A84C] text-xs font-semibold truncate max-w-[160px]">{selectedMesh}</span>
-              <button
-                onClick={() => selectMesh(null)}
-                className="text-[#888] hover:text-white text-xs leading-none"
-              >
-                ✕
-              </button>
-            </div>
-          )}
-          {loaded && !selectedMesh && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-              <span className="text-white/30 text-xs">Нажмите на деталь для выбора</span>
-            </div>
-          )}
-          <iframe
-            key={selectedCar.key}
-            ref={iframeRef}
-            src={`/viewer.html?glb=https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/${selectedCar.key}.glb`}
-            className="w-full h-full border-0"
-          />
+        <div className="flex-1 relative">
+          {viewerBlock}
         </div>
-
-        {/* Right panel — full catalog */}
         <div className="w-64 shrink-0 bg-[#0d0d0d] border-l border-[#1a1a1a] flex flex-col">
-          {/* Selected color info */}
-          <div className="px-4 pt-4 pb-3 border-b border-[#1a1a1a]">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl shrink-0 border border-white/10" style={{ backgroundColor: selectedColor.colorHex }} />
-              <div className="min-w-0">
-                <p className="text-white text-sm font-semibold truncate">{selectedColor.name}</p>
-                <p className="text-[#555] text-[11px]">{FINISH_LABELS[selectedColor.finish]} · {selectedColor.brand}</p>
-              </div>
-            </div>
-            {selectedMesh && (
-              <p className="text-[#C9A84C]/70 text-[10px] mt-2 truncate">Деталь: {selectedMesh}</p>
-            )}
-          </div>
+          {colorPanelContent}
+        </div>
+      </div>
 
-          {/* Finish tabs */}
-          <div className="flex gap-1 px-3 pt-3 pb-2 flex-wrap">
-            {FINISHES.map(f => (
-              <button
-                key={f}
-                onClick={() => setActiveFinish(f)}
-                className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
-                  activeFinish === f
-                    ? 'bg-[#C9A84C] text-black'
-                    : 'bg-[#151515] text-[#666] hover:text-[#aaa]'
-                }`}
-              >
-                {FINISH_LABELS[f]}
-              </button>
-            ))}
-          </div>
+      {/* Mobile layout */}
+      <div className="flex md:hidden flex-col flex-1 overflow-hidden pt-16">
+        {/* 3D Viewer — top half */}
+        <div className="h-[40vh] shrink-0">
+          {viewerBlock}
+        </div>
 
-          {/* Color grid */}
-          <div className="flex-1 overflow-y-auto px-3 pb-3">
-            <div className="grid grid-cols-4 gap-1.5">
-              {MATERIALS.filter(m => m.finish === activeFinish).map(color => (
-                <button
-                  key={color.id}
-                  title={`${color.name} · ${color.brand} ${color.sku}`}
-                  onClick={() => applyColor(color)}
-                  className={`aspect-square rounded-xl border-2 transition-all hover:scale-105 ${
-                    selectedColor.id === color.id
-                      ? 'border-[#C9A84C] scale-110'
-                      : 'border-transparent hover:border-[#444]'
-                  }`}
-                  style={{ backgroundColor: color.colorHex }}
-                />
-              ))}
-            </div>
-          </div>
+        {/* Tab bar */}
+        <div className="flex border-t border-b border-[#1a1a1a] bg-[#0d0d0d] shrink-0">
+          <button
+            onClick={() => setMobileTab('models')}
+            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+              mobileTab === 'models' ? 'text-[#C9A84C] border-b-2 border-[#C9A84C]' : 'text-[#555]'
+            }`}
+          >
+            Модели
+          </button>
+          <button
+            onClick={() => setMobileTab('colors')}
+            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
+              mobileTab === 'colors' ? 'text-[#C9A84C] border-b-2 border-[#C9A84C]' : 'text-[#555]'
+            }`}
+          >
+            Цвета
+          </button>
+        </div>
 
-          {/* Bottom actions */}
-          <div className="px-3 pb-4 pt-2 border-t border-[#1a1a1a] space-y-2">
-            <a
-              href="tel:+74954111003"
-              className="block w-full text-center bg-[#C9A84C] text-black font-bold py-3 rounded-xl text-sm hover:bg-[#b8963e] transition-colors"
-            >
-              Записаться
-            </a>
-            <Link
-              href="/ai-wrap"
-              className="block w-full text-center border border-[#C9A84C]/30 text-[#C9A84C] font-semibold py-3 rounded-xl text-sm hover:border-[#C9A84C] transition-colors"
-            >
-              AI примерка ✦
-            </Link>
-          </div>
+        {/* Tab content */}
+        <div className="flex-1 overflow-hidden bg-[#0d0d0d] flex flex-col">
+          {mobileTab === 'models' ? (
+            <div className="flex-1 overflow-y-auto">{carListContent}</div>
+          ) : (
+            <div className="flex-1 flex flex-col overflow-hidden">{colorPanelContent}</div>
+          )}
         </div>
       </div>
     </main>
