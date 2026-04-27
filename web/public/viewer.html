@@ -4193,6 +4193,7 @@ three/build/three.module.js:
           revokeCurrentObjectUrl()
         }
         sendToRN({ type: 'model_loaded', meshNames, bodyMeshNames })
+        try { if (window.parent && window.parent.__cwModelLoaded) window.parent.__cwModelLoaded({ meshNames: meshNames, bodyMeshNames: bodyMeshNames }) } catch(e) {}
       },
       undefined,
       (err) => {
@@ -4473,6 +4474,8 @@ three/build/three.module.js:
     console.log('[viewer] ready');
     debugLog('viewer:ready')
     sendToRN({ type: 'ready' })
+    const _qm = new URLSearchParams(location.search).get('model')
+    if (_qm) { debugLog('autoload:' + _qm); loadModel('https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/' + _qm + '.glb') }
     })()
   </script>
 </body>

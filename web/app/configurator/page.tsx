@@ -118,6 +118,25 @@ export default function ConfiguratorPage() {
   }, [])
 
   useEffect(() => {
+    function onModelLoaded(data: { meshNames: string[], bodyMeshNames: string[] }) {
+      const names: string[] = data.meshNames ?? []
+      const bodyNames: string[] = data.bodyMeshNames ?? names
+      setMeshNames(names)
+      meshNamesRef.current = names
+      bodyMeshNamesRef.current = bodyNames
+      setLoaded(true)
+      loadedRef.current = true
+      if (pendingColorRef.current) {
+        applyColorToAll(pendingColorRef.current, bodyNames)
+        pendingColorRef.current = null
+      }
+    }
+    ;(window as any).__cwModelLoaded = onModelLoaded
+    return () => { delete (window as any).__cwModelLoaded }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     function handleMsg(e: MessageEvent) {
       const msg = e.data
       if (msg?.type === 'ready') {
@@ -274,7 +293,7 @@ export default function ConfiguratorPage() {
       <iframe
         key={selectedCar.key}
         ref={iframeRef}
-        src="/viewer.html"
+        src={`/viewer.html?model=${selectedCar.key}`}
         className="w-full h-full border-0"
         onLoad={() => {
           // Always send load_model from onLoad — don't rely on 'ready' message.
