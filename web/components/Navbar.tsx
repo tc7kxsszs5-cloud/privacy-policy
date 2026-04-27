@@ -3,13 +3,14 @@ import Image from 'next/image'
 import AssistantStar from './AssistantStar'
 
 interface NavbarProps {
-  active?: 'catalog' | 'prices' | 'ai-wrap' | 'assistant' | 'configurator'
+  active?: 'catalog' | 'prices' | 'ai-wrap' | 'assistant' | 'configurator' | 'gallery'
 }
 
 export default function Navbar({ active }: NavbarProps) {
   const links = [
     { href: '/configurator', label: '3D Конфигуратор', id: 'configurator' },
     { href: '/catalog', label: 'Каталог', id: 'catalog' },
+    { href: '/gallery', label: 'Работы', id: 'gallery' },
     { href: '/prices', label: 'Цены', id: 'prices' },
     { href: '/ai-wrap', label: 'AI примерка', id: 'ai-wrap' },
   ]

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { MATERIALS, FINISHES, FINISH_LABELS, type Material, type Finish } from '@/lib/catalog'
@@ -117,7 +117,7 @@ export default function ConfiguratorPage() {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function onModelLoaded(data: { meshNames: string[], bodyMeshNames: string[] }) {
       const names: string[] = data.meshNames ?? []
       const bodyNames: string[] = data.bodyMeshNames ?? names
@@ -293,7 +293,7 @@ export default function ConfiguratorPage() {
       <iframe
         key={selectedCar.key}
         ref={iframeRef}
-        src={`/viewer.html?model=${selectedCar.key}`}
+        src={`/viewer.html#model=${selectedCar.key}`}
         className="w-full h-full border-0"
         onLoad={() => {
           // Always send load_model from onLoad — don't rely on 'ready' message.

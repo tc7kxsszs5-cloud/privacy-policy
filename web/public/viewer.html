@@ -4474,7 +4474,7 @@ three/build/three.module.js:
     console.log('[viewer] ready');
     debugLog('viewer:ready')
     sendToRN({ type: 'ready' })
-    const _qm = new URLSearchParams(location.search).get('model')
+    const _qm = new URLSearchParams(location.hash.slice(1)).get('model')
     if (_qm) { debugLog('autoload:' + _qm); loadModel('https://svicokgjtmaukzhapzrr.supabase.co/storage/v1/object/public/models/' + _qm + '.glb') }
     })()
   </script>

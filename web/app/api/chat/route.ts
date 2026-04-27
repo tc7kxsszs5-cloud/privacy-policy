@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server'
 
+export const runtime = 'edge'
+export const preferredRegion = 'fra1' // Frankfurt — ближе к России, Yandex не блокирует
+
 const SYSTEM_PROMPT = `Ты — ИИ-ассистент студии Detailing Time. Студия специализируется на оклейке и детейлинге автомобилей.
 
 Адрес: Москва, ул. Маршала Прошлякова, 14к2
@@ -41,7 +44,8 @@ export async function POST(req: NextRequest) {
 
   if (!res.ok) {
     const err = await res.text()
-    return Response.json({ error: `Ошибка API: ${res.status}` }, { status: res.status })
+    console.error('Yandex API error', res.status, err)
+    return Response.json({ error: `Ошибка API: ${res.status}`, detail: err }, { status: res.status })
   }
 
   const data = await res.json()
